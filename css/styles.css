@@ -868,3 +868,168 @@ audio {
     animation: none;
   }
 }
+
+.album-cover-panel {
+  margin-top: 1.2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.album-cover-panel img {
+  width: min(100%, 460px);
+  border-radius: 14px;
+  border: 1px solid rgba(108, 242, 255, 0.24);
+  box-shadow: var(--shadow);
+}
+
+.codex-grid {
+  margin-top: 1.2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.codex-column {
+  min-height: 620px;
+}
+
+.codex-scrollbox {
+  max-height: 470px;
+  overflow: auto;
+  padding-right: 0.25rem;
+}
+
+.codex-scrollbox p {
+  line-height: 1.6;
+}
+
+.codex-column h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.codex-track-list {
+  margin: 0.7rem 0 1rem;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+  max-height: 360px;
+  overflow: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.codex-track-btn {
+  width: 100%;
+  text-align: left;
+  background: rgba(8, 10, 17, 0.8);
+  color: var(--muted);
+  border: 1px solid rgba(156, 168, 208, 0.24);
+  border-radius: 9px;
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+  transition: 180ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.codex-track-btn::before {
+  content: "✶";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.85);
+  color: rgba(108, 242, 255, 0.16);
+  font-size: 1rem;
+  opacity: 0;
+  transition: 180ms ease;
+}
+
+.codex-track-btn:hover::before,
+.codex-track-btn:focus-visible::before,
+.codex-track-btn.is-active::before {
+  opacity: 1;
+}
+
+.codex-track-btn:hover,
+.codex-track-btn:focus-visible,
+.codex-track-btn.is-active {
+  color: var(--text);
+  border-color: rgba(108, 242, 255, 0.35);
+  background: rgba(108, 242, 255, 0.08);
+}
+
+.codex-track-number {
+  color: var(--accent);
+  display: inline-block;
+  min-width: 2rem;
+}
+
+.codex-column-center {
+  position: relative;
+}
+
+.codex-watermark {
+  position: absolute;
+  inset: 140px 0 auto;
+  text-align: center;
+  font-size: 4.6rem;
+  letter-spacing: 0.4rem;
+  color: rgba(108, 242, 255, 0.06);
+  pointer-events: none;
+  user-select: none;
+}
+
+.codex-waveform {
+  height: 38px;
+  border-radius: 9px;
+  border: 1px solid rgba(156, 168, 208, 0.24);
+  margin-bottom: 0.65rem;
+  background:
+    repeating-linear-gradient(90deg, rgba(156, 168, 208, 0.26) 0 2px, transparent 2px 8px),
+    linear-gradient(180deg, rgba(108, 242, 255, 0.08), rgba(149, 119, 255, 0.08));
+}
+
+.codex-audio-note {
+  min-height: 1.2rem;
+  margin-top: 0.55rem;
+  font-size: 0.9rem;
+}
+
+.is-panel-fading {
+  animation: codex-fade-in 240ms ease;
+}
+
+@keyframes codex-fade-in {
+  from {
+    opacity: 0.35;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1100px) {
+  .codex-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .codex-column {
+    min-height: 0;
+  }
+
+  .codex-scrollbox {
+    max-height: 360px;
+  }
+
+  .codex-watermark {
+    inset: 120px 0 auto;
+  }
+}

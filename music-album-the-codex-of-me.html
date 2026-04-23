@@ -1,9 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>THE SCROLLSMITH | The Codex of Me</title><link rel="stylesheet" href="css/styles.css" /></head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE SCROLLSMITH | The Codex of Me</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
   <body>
-    <header class="site-header"><div class="container header-row"><a class="brand" href="index.html"><span class="brand-mark">Mythic Signal</span><span class="brand-name">THE SCROLLSMITH</span></a><button class="menu-toggle" data-menu-toggle aria-expanded="false" aria-label="Open menu">Menu</button><nav class="main-nav" data-main-nav data-open="false"><ul><li><a href="index.html">Home</a></li><li><a href="music.html">Music Overview</a></li><li><a href="music-albums.html">Albums</a></li><li><a href="contact.html">Contact</a></li></ul></nav></div></header>
-    <main class="container"><section class="panel"><p class="kicker">Music / Albums</p><h1>The Codex of Me</h1><p class="lead">Album archive page for The Codex of Me. Add artwork, tracklist, and release links here.</p></section></main>
-    <footer class="site-footer"><div class="container">THE SCROLLSMITH © 2026</div></footer><script src="js/main.js"></script>
+    <header class="site-header">
+      <div class="container header-row">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">Mythic Signal</span>
+          <span class="brand-name">THE SCROLLSMITH</span>
+        </a>
+        <button class="menu-toggle" data-menu-toggle aria-expanded="false" aria-label="Open menu">Menu</button>
+        <nav class="main-nav" data-main-nav data-open="false">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="music.html">Music Overview</a></li>
+            <li><a href="music-albums.html">Albums</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+      <section class="panel">
+        <p class="kicker">Music / Albums</p>
+        <h1>The Codex of Me</h1>
+        <p class="lead">A ritual interface where lore, codex, and lyric archive move as one living scroll.</p>
+      </section>
+
+      <section class="panel album-cover-panel">
+        <img src="assets/img/codexofme.png" alt="The Codex of Me album cover" />
+      </section>
+
+      <section class="codex-grid" data-codex-root>
+        <article class="panel codex-column codex-column-lore">
+          <p class="kicker">The Lore Panel</p>
+          <h2 data-track-title>Lore Entry</h2>
+          <div class="codex-scrollbox">
+            <h3>Description</h3>
+            <p class="muted codex-fade-target" data-track-description></p>
+            <h3>About</h3>
+            <p class="muted codex-fade-target" data-track-about></p>
+            <h3>Behind the Scenes</h3>
+            <p class="muted codex-fade-target" data-track-bts></p>
+            <h3>Powerful Quotes</h3>
+            <ul class="tracks codex-fade-target" data-track-quotes></ul>
+          </div>
+        </article>
+
+        <article class="panel codex-column codex-column-center">
+          <p class="kicker">The Interactive Codex</p>
+          <h2>Track Scroll</h2>
+          <p class="muted">Select a chapter to turn the page.</p>
+          <div class="codex-watermark" aria-hidden="true">SIGIL</div>
+          <ol class="codex-track-list" data-track-list></ol>
+          <div class="codex-waveform" aria-hidden="true"></div>
+          <audio controls preload="none" data-track-player>
+            <source data-track-source src="" type="audio/mpeg" />
+            Your browser does not support the audio player.
+          </audio>
+          <p class="muted codex-audio-note" data-track-audio-note></p>
+        </article>
+
+        <article class="panel codex-column codex-column-lyrics">
+          <p class="kicker">The Lyric Archive</p>
+          <h2>Written Scroll</h2>
+          <div class="codex-scrollbox codex-fade-target" data-track-lyrics></div>
+        </article>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="container">THE SCROLLSMITH © 2026</div></footer>
+    <script>
+      window.CODEX_ALBUM_DATA = {
+        albumTitle: "The Codex of Me",
+        tracks: [
+          {
+            title: "Limitless",
+            audioSrc: "assets/audio/Limitless.mp3",
+            description: "The opening glyph. Limitless is the ignition of will, where fear fractures and scope expands.",
+            about: "This chapter marks the decision to stop shrinking and begin moving as the full self.",
+            behindTheScenes: "Built as a launch sequence with wide dynamics and deliberate rise in intensity.",
+            quotes: ["No ceiling over this pulse.", "I write horizon where walls used to be."],
+            lyricsHtml:
+              "<p><strong>[Male Vocal]</strong></p><p>I cross the line they drew around my name,<br/>and call it dawn.</p><p><strong>[Hook]</strong></p><p>Limitless, limitless,<br/>I move like signal, not permission.</p>",
+          },
+          {
+            title: "Recognize",
+            audioSrc: "assets/audio/Recognize.mp3",
+            description: "A chapter of revelation. Recognize confronts masks and names what is true beneath noise.",
+            about: "Written from the need to be seen clearly rather than conveniently.",
+            behindTheScenes: "Sharper percussive choices support a confessional vocal lane.",
+            quotes: ["See me before you label me.", "Truth does not ask to be convenient."],
+            lyricsHtml:
+              "<p><strong>[Male Vocal]</strong></p><p>Say my name without your version attached,<br/>and watch the room change shape.</p>",
+          },
+          {
+            title: "Today",
+            audioSrc: "assets/audio/Today.mp3",
+            description: "The present-tense oath. Today refuses delay and chooses immediate action.",
+            about: "A personal checkpoint song written in a season of urgent change.",
+            behindTheScenes: "Minimal arrangement at first, then expanded to mirror commitment locking in.",
+            quotes: ["I don't postpone becoming.", "Today is where the vow survives."],
+            lyricsHtml:
+              "<p><strong>[Hook]</strong></p><p>Today I choose the weight,<br/>today I choose the climb.</p>",
+          },
+          { title: "Somebody Else", audioSrc: "assets/audio/Somebody Else.mp3", description: "A warning against self-erasure in search of acceptance.", about: "This one protects identity under pressure.", behindTheScenes: "Drafted from late-night voice memo fragments.", quotes: ["I won't disappear for applause.", "I was not made to mimic ghosts."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "Rewired", audioSrc: "assets/audio/Rewired.mp3", description: "A neural reset chapter about rebuilding thought patterns.", about: "Represents retraining survival habits into intentional response.", behindTheScenes: "Layered synth pulses to mimic electrical rerouting.", quotes: ["Old circuits don't own me.", "I choose the signal I carry."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "Breaker of Chains", audioSrc: "assets/audio/Breaker of Chains.mp3", description: "Liberation arc. The chapter where inherited limits are cut.", about: "Connected to leaving cycles that felt permanent.", behindTheScenes: "Percussion designed as strike-and-release motion.", quotes: ["I was never meant for cages.", "Listen to the iron split."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "Darkness", audioSrc: "assets/audio/Darkness.mp3", description: "An inward descent that maps fear without surrendering to it.", about: "A song about surviving the interior night.", behindTheScenes: "Sparse space in the mix keeps the vulnerability exposed.", quotes: ["I name the dark and keep walking.", "Night taught me how to hear."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "You Won't See The Strike Land", audioSrc: "assets/audio/You Wont See The Strike Land.mp3", description: "Precision and patience chapter; power in quiet preparation.", about: "Reflects learning to move without announcing every move.", behindTheScenes: "Rhythmic pauses used as misdirection.", quotes: ["Silence can be strategy.", "Impact arrives before warning."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "Sober Me", audioSrc: "assets/audio/Sober Me.mp3", description: "A mirror chapter that strips noise and excuses.", about: "Rooted in accountability and clear self-confrontation.", behindTheScenes: "Kept intentionally dry and intimate.", quotes: ["No haze between me and the truth.", "Clarity is a hard mercy."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "Gravitational Waltz", audioSrc: "assets/audio/Gravitational Waltz.mp3", description: "Orbit and pull; the choreography of attachment and consequence.", about: "Explores recurring return to what still has weight in the heart.", behindTheScenes: "Triple-feel motifs inspired the title's waltz motion.", quotes: ["We spin where gravity confesses.", "Every orbit remembers."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "I Can Rise Again", audioSrc: "assets/audio/I can rise again.mp3", description: "A defiant resurrection chapter in imperfect language and perfect intent.", about: "Written as proof that recovery can begin mid-collapse.", behindTheScenes: "Retained raw phrasing to preserve emotional honesty.", quotes: ["Even broken syntax can pray.", "Rise is a verb, not a mood."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "Not Built For The Night", audioSrc: "assets/audio/Not Built For The Night.mp3", description: "Acknowledges fragility without romanticizing ruin.", about: "About limits, exhaustion, and choosing restoration over self-destruction.", behindTheScenes: "Low-light textures and restrained drums shape the atmosphere.", quotes: ["I am not a machine for midnight.", "Rest is part of the war."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "The Echo of Marriage", audioSrc: "assets/audio/The Echo Of Marriage.mp3", description: "A relational relic chapter carrying vows, fracture, and reverberation.", about: "Processes partnership memory and unresolved tenderness.", behindTheScenes: "Vocal doubles used to symbolize past and present voices.", quotes: ["Promises still ring in empty rooms.", "Some echoes refuse to fade."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "Just One Person", audioSrc: "assets/audio/Just One Person.mp3", description: "A focused devotion chapter about singular witness and bond.", about: "Centers on the power of being truly known by one soul.", behindTheScenes: "Simplified arrangement to keep the lyric at the front.", quotes: ["One witness can rebuild a world.", "I only needed one true name."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "Autonomy", audioSrc: "assets/audio/Autonomy.mp3", description: "Sovereignty chapter; reclaiming agency from pressure and projection.", about: "Represents boundaries established without apology.", behindTheScenes: "Rigid groove designed to feel deliberate and immovable.", quotes: ["My will is not a public resource.", "I decide where this story bends."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "The Mirror You Hate", audioSrc: "assets/audio/The Mirror You Hate.mp3", description: "Confrontational chapter reflecting denied truths back to the watcher.", about: "Addresses conflict that comes when honesty threatens comfort.", behindTheScenes: "Call-response phrasing shaped as accusation and answer.", quotes: ["Don't punish me for your reflection.", "I am not your edited mirror."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "I Won't Bow My Head", audioSrc: "assets/audio/I Wont Bow My Head.mp3", description: "Defiance chapter rooted in dignity under pressure.", about: "Personal declaration against humiliation and forced silence.", behindTheScenes: "Built around upright vocal posture and marching cadence.", quotes: ["Respect is not surrendered.", "My spine remembers who I am."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "Ashes & Artifacts", audioSrc: "assets/audio/Ashes And Artifacts.mp3", description: "Archive chapter holding what burned and what survived.", about: "A healing inventory of loss, memory, and what remains usable.", behindTheScenes: "Dusty textures layered with bright overtones to embody contrast.", quotes: ["From ruin, I catalog meaning.", "What survived becomes scripture."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "One Day", audioSrc: "assets/audio/One Day.mp3", description: "Future-facing chapter of patience and persistent hope.", about: "Written in a season of waiting for long-form outcomes.", behindTheScenes: "Slow-build progression emphasizes endurance over urgency.", quotes: ["One day is still a direction.", "Hope can outlast the storm."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+          { title: "Glyphwake V - VIII", audioSrc: "assets/audio/Glyphwake_ V - VIII.mp3", description: "Closing sequence; multi-part codex awakening and integration.", about: "Represents synthesis of identity threads into one active signal.", behindTheScenes: "Structured as a chapter chain rather than a single scene.", quotes: ["The glyphs are awake.", "The signal now has a body."], lyricsHtml: "<p><em>Lyric archive entry pending inscription.</em></p>" },
+        ],
+      };
+    </script>
+    <script src="js/main.js"></script>
+    <script src="js/album-codex-template.js"></script>
   </body>
 </html>
