@@ -4,4 +4,5 @@
 nomi_memories/
 schedule-state.json
 injections.json
+situation.json
 node_modules/

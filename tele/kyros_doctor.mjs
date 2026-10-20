@@ -108,6 +108,17 @@ if (fs.existsSync(MEM_DIR)) {
 if (fs.existsSync(path.join(HERE, 'index2.mjs'))) ok('index2.mjs present');
 else bad('index2.mjs not in this folder');
 
+if (fs.existsSync(path.join(HERE, 'situation.json'))) {
+    try {
+        const sit = JSON.parse(fs.readFileSync(path.join(HERE, 'situation.json'), 'utf8'));
+        ok(`situation.json "${String(sit.text || '').slice(0, 60)}"`);
+    } catch (e) {
+        warn(`situation.json unreadable: ${e.message}`);
+    }
+} else {
+    warn('no situation.json yet — /status or !status has not been set on this box');
+}
+
 if (fs.existsSync(path.join(HERE, 'kyros_scheduler.mjs'))) ok('kyros_scheduler.mjs present');
 else warn('kyros_scheduler.mjs not in this folder (clock will not fire)');
 

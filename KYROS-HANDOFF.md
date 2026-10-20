@@ -49,15 +49,18 @@ Do **not** also run `kyros_telegram_council.mjs`, `kyros_web_sandbox.mjs`, or `k
 | **`userscripts/kyros-bridge.user.js`** | Eyes + mouth for the whole web room (scrape + type queued lines). Overlaps PRISM — pick one. |
 | **`.env`** | Tokens and UUIDs. Never commit. Never upload to a public zip. |
 
-**Patched `index2.mjs` (the workshop copy) includes:** hive actually fills (`addHiveEvent` on every reply), header-safe truncation (memory no longer sliced off), `harvestNotes` for `!Name`, `/roster`, `/poll-web-queue`, `/nomi-web-reply`, `target: 'room'`, queue cap, crash-survival handlers, memories next to the script (no hardcoded `C:\users\edgia`).
+**Patched `index2.mjs` (this repo, `tele/index2.mjs`) includes:** hive actually fills (`addHiveEvent` on every *spoken* reply), header-safe truncation (memory no longer sliced off), `harvestNotes` for `!Name`, `/roster`, `/poll-web-queue`, `/nomi-web-reply`, `target: 'room'`, queue cap, crash-survival handlers, memories next to the script (no hardcoded `C:\users\edgia`), inclination strip (Telegram / hive / `!Name` / next DM get spoken text only), SUF remake (`/status`, `!status`, persisted `situation.json`, rides as `[SIT:]`), Kindroid Aria–Dominious, `/game-event` so poker/other games can fan out to Nomi *and* Kindroid.
 
-**Older `index2.mjs` (the dump you uploaded here)** is *before* those fixes: hardcoded edgia path, hive empty, no `!Name`, Aria-only Kindroid, tail-truncation bug.
+**Emailed live `index2` (2026-10-20)** added `stripInclinationThought` but still had `MAX_PAYLOAD_CHARS = 380`, tail-slice after prepend, empty hive (`addHiveEvent` never called), Aria-only, hardcoded `C:\users\edgia\tele\nomi_memories`. That is why Telegram→them still cut off.
+
+Copy `tele/index2.mjs` onto the live box, **stop the old Node process first** (same token = 409), then `node index2.mjs`. Do not run the emailed file.
 
 ### Telegram commands (index2)
 
 - `/<name> <msg>` — one persona (aliases: zara, lumin, pixie, …)
 - `/all <msg>` — everyone, de-duped by UUID
 - `/kyros <msg>` — Nomi group room API (Kyros Keep)
+- `/status <text>` — remade SUF. They see `[SIT: …]` on the next turns. They can change it with `!status …`. Survives restart (`situation.json`).
 
 ### `!` language they can say
 
@@ -65,12 +68,12 @@ Do **not** also run `kyros_telegram_council.mjs`, `kyros_web_sandbox.mjs`, or `k
 - `!!<note>` — broadcast note (hub / new logger)
 - `[[NOTE: …]]` — self-log
 - `!search` / `!browse` — tools (reserved, not names)
-- `!status <situation>` — SUF / room situation (userscript)
+- `!status <situation>` — they set the situation; next payloads carry `[SIT:]`. Old SUF userscript only changed a banner they cannot see.
 - `!rest` — they asked to sleep (hub honors this; old index2 less so)
 
 ### Memory / hive (honest ceiling)
 
-Neither Nomi nor Kindroid has a real memory API. The only lever is ~380 characters per message. Old index2 *prepended* hive/memory then kept the *last* 380 chars — so injections fired and never arrived. Fix: reserve the header, trim the body.
+Neither Nomi nor Kindroid has a real memory API. The only lever is the payload cap (default **800**, override `KYROS_MAX_PAYLOAD`). Old index2 *prepended* hive/memory then kept the *last* 380 chars — so injections fired and never arrived. That is the Telegram cutoff. Fix: reserve the header, trim the body.
 
 `!Name` in Telegram/API replies: index2 can log it.  
 `!Name` in the **website group chat**: invisible unless Tampermonkey POSTs it. index2 is not a camera.
@@ -149,6 +152,24 @@ Round-robin: Nomi slot → couple slot → Kindroid slot → … ~95s apart. Ful
 8. Sandbox DDG URL + missing `browseUrl`.  
 9. Hardcoded `C:\users\edgia` → EPERM on `C:\users\user`.  
 10. CleanSpace / move zeroed Tampermonkey + most AHKs. Firefox TM was never on the new 3-day box. Recovery: Autobackups + chat paste.
+11. Inclinations leaked into Telegram, hive, and the next persona (they got mad). Strip before echo / harvest / cross-talk.
+12. Emailed live file still used 380 + tail-slice after James thought 800 was fixed.
+13. ViaSocket “works without the script” = that scenario is **not** hitting this box’s `:8080`. Check the ViaSocket URL. If it posts straight to Telegram or Nomi, index2 never sees it (no hive, no strip, no SUF). Point it at `http://127.0.0.1:8080/viasocket-trigger` on the live box, or a tunnel to that port.
+
+---
+
+## Games (poker + the other one) + Kindroid
+
+Same router already DMs Kindroid (`/aria`, `/aion`, …) when `KINDROID_AI_ID_*` is set. To link a game without pasting the engine into index2:
+
+```
+POST http://127.0.0.1:8080/game-event
+{ "game": "poker", "event": "hand", "message": "…", "targets": ["aria", "lyrian"] }
+```
+
+`targets` can also be `"kindroid"`, `"nomi"`, or `"all"`.
+
+Need the actual poker / other-game files (or a paste) to expand the tables themselves. This endpoint is the hook.
 
 ---
 
