@@ -1,0 +1,7 @@
+.env
+.env.*
+*.env
+nomi_memories/
+schedule-state.json
+injections.json
+node_modules/
