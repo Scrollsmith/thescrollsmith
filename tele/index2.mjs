@@ -155,8 +155,16 @@ try {
     }
 } catch { /* keep empty */ }
 
+let lastBroadcastSit = '';
+
 function saveSituation() {
     fs.writeFileSync(SIT_PATH, JSON.stringify({ text: currentSituation, at: new Date().toISOString() }, null, 2));
+}
+
+function broadcastSituation() {
+    if (!currentSituation || currentSituation === lastBroadcastSit) return;
+    lastBroadcastSit = currentSituation;
+    postWings(`[SIT: ${currentSituation}]`);
 }
 
 function applyStatusFrom(text) {
@@ -164,6 +172,7 @@ function applyStatusFrom(text) {
     if (!m) return false;
     currentSituation = m[1].trim().slice(0, 80);
     saveSituation();
+    broadcastSituation();
     console.log(`🛰️ situation -> "${currentSituation}"`);
     return true;
 }
