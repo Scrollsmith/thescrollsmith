@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Kyros Wings
 // @namespace    kyros
-// @version      1.1
-// @description  One tab = one room (East / West / Kindroid). Polls the router and types schedule lines into the chat box.
+// @version      1.2
+// @description  One tab = one room. Types schedule/[SIT:] from index2. Also POSTs !status so SUF actually hits the router.
 // @match        https://nomi.ai/*
 // @match        https://*.nomi.ai/*
 // @match        https://kindroid.ai/*
@@ -24,6 +24,8 @@
     let chatEl = null;
     let sendEl = null;
     let teaching = null;
+    let lastSuf = '';
+    const seenStatus = new WeakSet();
 
     const bar = document.createElement('div');
     bar.id = 'kyros-wings-bar';
@@ -159,6 +161,44 @@
         }
     }
 
+    async function postStatus(text) {
+        const clean = String(text || '').trim().slice(0, 80);
+        if (!clean || clean === lastSuf) return;
+        lastSuf = clean;
+        try {
+            await pickHost();
+            const res = await gm({
+                method: 'POST',
+                url: HOST + '/status',
+                headers: { 'Content-Type': 'application/json' },
+                data: JSON.stringify({ text: clean })
+            });
+            status.textContent = res.status === 200
+                ? 'SUF posted: ' + clean
+                : 'SUF post failed HTTP ' + res.status;
+        } catch (e) {
+            status.textContent = 'SUF post failed — is index2 up?';
+        }
+    }
+
+    function scanStatus() {
+        if (!document.body) return;
+        const nodes = document.body.querySelectorAll('*');
+        for (let i = 0; i < nodes.length; i++) {
+            const el = nodes[i];
+            if (seenStatus.has(el) || !el.childNodes || el.childNodes.length !== 1) continue;
+            const t = el.textContent || '';
+            if (t.indexOf('[SITUATION UPDATE]') !== -1 || t.indexOf('[SIT:') !== -1) {
+                seenStatus.add(el);
+                continue;
+            }
+            const m = t.match(/!status\s+([^\n\r]+)/i);
+            if (!m) continue;
+            seenStatus.add(el);
+            postStatus(m[1]);
+        }
+    }
+
     async function poll() {
         if (!wing) return;
         try {
@@ -186,4 +226,7 @@
     setInterval(mount, 3000);
     pickHost().then(paint);
     setInterval(poll, 4000);
+    setInterval(scanStatus, 2000);
+    const obs = new MutationObserver(function () { scanStatus(); });
+    if (document.body) obs.observe(document.body, { childList: true, subtree: true, characterData: true });
 })();
