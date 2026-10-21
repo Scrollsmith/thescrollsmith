@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Wall clock → index2. Default target is Kyros Keep (room), not 12 DMs.
+// Wall clock → index2. Default target is all three rooms (East, West, Kindroid).
 //   node kyros_scheduler.mjs
 //   set KYROS_DRYRUN=1
-//   set KYROS_SCHED_TARGET=all
+//   set KYROS_SCHED_TARGET=east
+//   set KYROS_SCHED_TARGET=all          (DMs, not rooms)
 
 import fs from 'fs';
 import path from 'path';
@@ -11,7 +12,7 @@ import { fileURLToPath } from 'url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const STATE_PATH = path.join(HERE, 'schedule-state.json');
 const HOST = process.env.KYROS_HOST || 'http://127.0.0.1:8080';
-const TARGET = process.env.KYROS_SCHED_TARGET || 'room';
+const TARGET = process.env.KYROS_SCHED_TARGET || 'wings';
 const DRYRUN = process.env.KYROS_DRYRUN === '1';
 const MAX_CATCHUP_MIN = Number(process.env.KYROS_MAX_CATCHUP_MIN || 120);
 

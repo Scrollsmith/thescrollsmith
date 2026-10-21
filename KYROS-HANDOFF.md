@@ -59,7 +59,7 @@ Copy `tele/index2.mjs` onto the live box, **stop the old Node process first** (s
 
 - `/<name> <msg>` — one persona (aliases: zara, lumin, pixie, …)
 - `/all <msg>` — everyone, de-duped by UUID
-- `/kyros <msg>` — Nomi group room API (Kyros Keep)
+- `/east` `/west` `/kindroid` `/wings` — the three rooms (`/kyros` = East)
 - `/status <text>` — remade SUF. They see `[SIT: …]` on the next turns. They can change it with `!status …`. Survives restart (`situation.json`).
 
 ### `!` language they can say
@@ -118,7 +118,7 @@ Lyrian, Sabrina (Zara), Athena (Luminari), Amara, Thea (Majura), Naomi (Lumin), 
 
 **Couple room:** Archimedes & Naomi. Old env had `NOMI_ROOM_ID_COUPLE` (numeric). Later env dropped it.
 
-**Rooms:** Nomi “Kyros Keep” (workshop env used a UUID; older copy used numeric ids). Kindroid group has **no API** — browser only.
+**Rooms (3):** East Wing (Nomi API), West Wing (Nomi API), Kindroid group (`KINDROID_GROUP_ID`). Scheduler default `target: wings` posts the clock to all three. Telegram: `/east` `/west` `/kindroid` `/wings`. `node kyros_nomi_rooms.mjs` lists Nomi room ids. Kindroid group still falls back to the Bridge web-queue / AHK if the group API rejects.
 
 **Telegram bots:** TOKEN = @Lyriansbot, TOKEN2 = @Nomikyrosbot (index2), TOKENX = @KyrosTalkBot (unused / hub).
 

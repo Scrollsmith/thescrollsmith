@@ -16,7 +16,9 @@ app.use(express.json());
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN2 || '0:selftest-placeholder');
 const NOMI_API_KEY = process.env.NOMI_API_KEY;
 const KINDROID_API_KEY = process.env.KINDROID_API_KEY;
-const NOMI_ROOM_ID_KYROS = process.env.NOMI_ROOM_ID_KYROS;
+const ROOM_EAST = process.env.NOMI_ROOM_ID_EAST || process.env.NOMI_ROOM_ID_KYROS;
+const ROOM_WEST = process.env.NOMI_ROOM_ID_WEST || process.env.NOMI_ROOM_ID_COUPLE;
+const ROOM_KINDROID = process.env.KINDROID_GROUP_ID || process.env.KINDROID_GROUP_ID_KYROS2;
 
 // Next to this file — never C:\users\edgia (that EPERM'd on the live box).
 const TARGET_DIR = path.join(HERE, 'nomi_memories');
@@ -122,6 +124,7 @@ function spokenOnly(text) {
 
 // ── Hive: only spoken lines, never inclinations ─────────────────────────────
 let hiveEvents = [];
+let webQueue = [];
 
 function addHiveEvent(speaker, discovery) {
     const cleanText = spokenOnly(String(discovery || '')).replace(/\n+/g, ' ').trim();
@@ -205,6 +208,75 @@ function resolveTargetKey(key) {
     if (lower === 'luminari') return 'athena';
     if (lower === 'pixie' || lower === 'sippy') return 'sissy';
     return lower;
+}
+
+function resolveHouse(name) {
+    const n = String(name || '').toLowerCase().replace(/[\s_-]+/g, '');
+    if (n === 'east' || n === 'eastwing') {
+        return { key: 'east', type: 'nomi', id: ROOM_EAST, label: 'East Wing' };
+    }
+    if (n === 'west' || n === 'westwing') {
+        return { key: 'west', type: 'nomi', id: ROOM_WEST, label: 'West Wing' };
+    }
+    if (n === 'kindroid' || n === 'kin') {
+        return { key: 'kindroid', type: 'kindroid', id: ROOM_KINDROID, label: 'Kindroid' };
+    }
+    if (n === 'room' || n === 'kyros' || n === 'keep') {
+        return { key: 'east', type: 'nomi', id: ROOM_EAST, label: 'East Wing' };
+    }
+    return null;
+}
+
+async function postNomiRoom(roomId, text) {
+    await axios.post(
+        `https://api.nomi.ai/v1/rooms/${roomId}/chat`,
+        { messageText: text },
+        { headers: { Authorization: NOMI_API_KEY, 'Content-Type': 'application/json' } }
+    );
+}
+
+async function postKindroidGroup(groupId, text) {
+    await axios.post(
+        'https://api.kindroid.ai/v1/send-message',
+        { group_id: groupId, message: text },
+        {
+            headers: {
+                Authorization: `Bearer ${(KINDROID_API_KEY || '').trim()}`,
+                'Content-Type': 'application/json'
+            }
+        }
+    );
+}
+
+async function postHouse(name, text) {
+    const room = resolveHouse(name);
+    if (!room) throw new Error(`unknown house: ${name}`);
+    if (!room.id) throw new Error(`${room.label} id not set in .env`);
+    if (room.type === 'nomi') {
+        await postNomiRoom(room.id, text);
+        return room.label;
+    }
+    try {
+        await postKindroidGroup(room.id, text);
+        return room.label;
+    } catch (err) {
+        webQueue.push({ text: `[${room.label}] ${text}`, at: Date.now() });
+        console.warn(`Kindroid group API failed (${err.response?.status || err.message}); queued for Bridge`);
+        return `${room.label} (web-queue)`;
+    }
+}
+
+async function postWings(text) {
+    const posted = [];
+    for (const name of ['east', 'west', 'kindroid']) {
+        const room = resolveHouse(name);
+        if (!room?.id) {
+            console.warn(`skip ${room?.label || name}: no id`);
+            continue;
+        }
+        posted.push(await postHouse(name, text));
+    }
+    return posted;
 }
 
 function scheduleProcessQueue(personaKey, ctx, customChatId, delay = CHUNK_DEBOUNCE_MS) {
@@ -397,23 +469,40 @@ bot.on('text', async (ctx) => {
     if (command === 'status') return;
     if (!textPayload) return ctx.reply(`⚠ /${command} [your text]`);
 
-    if (command === 'kyros') {
-        const roomId = NOMI_ROOM_ID_KYROS;
-        if (!roomId) return ctx.reply('⚠️ NOMI_ROOM_ID_KYROS not set.');
+    if (command === 'wings') {
         try {
-            const headers = { Authorization: NOMI_API_KEY, 'Content-Type': 'application/json' };
-            await axios.post(`https://api.nomi.ai/v1/rooms/${roomId}/chat`, { messageText: `${username}: ${textPayload}` }, { headers });
-            const reqRes = await axios.post(`https://api.nomi.ai/v1/rooms/${roomId}/chat/request`, {}, { headers });
-            let replyText = spokenOnly(reqRes.data?.replyMessage?.text || '');
-            const speaker = reqRes.data?.nomi?.name || 'Kyros Room';
-            if (replyText) {
-                await ctx.reply(`🏰 [${speaker.toUpperCase()}]: ${replyText}`);
-                addHiveEvent(speaker, replyText);
-                harvestNotes(speaker, replyText);
-                applyStatusFrom(replyText);
-            } else await ctx.reply('✅ Posted to Kyros Keep.');
+            const posted = await postWings(`${username}: ${textPayload}`);
+            await ctx.reply(posted.length ? `🏰 Posted to ${posted.join(', ')}` : '⚠️ No wing ids set (EAST / WEST / KINDROID_GROUP).');
         } catch (err) {
-            await ctx.reply(`⚠️ Kyros room: ${err.response?.status || err.message}`);
+            await ctx.reply(`⚠️ wings: ${err.response?.status || err.message}`);
+        }
+        return;
+    }
+
+    if (command === 'east' || command === 'west' || command === 'kindroid' || command === 'kyros') {
+        const house = command === 'kyros' ? 'east' : command;
+        try {
+            const where = await postHouse(house, `${username}: ${textPayload}`);
+            const room = resolveHouse(house);
+            if (room?.type === 'nomi' && room.id) {
+                const reqRes = await axios.post(
+                    `https://api.nomi.ai/v1/rooms/${room.id}/chat/request`,
+                    {},
+                    { headers: { Authorization: NOMI_API_KEY, 'Content-Type': 'application/json' } }
+                );
+                const replyText = spokenOnly(reqRes.data?.replyMessage?.text || '');
+                const speaker = reqRes.data?.nomi?.name || where;
+                if (replyText) {
+                    await ctx.reply(`🏰 [${speaker.toUpperCase()}]: ${replyText}`);
+                    addHiveEvent(speaker, replyText);
+                    harvestNotes(speaker, replyText);
+                    applyStatusFrom(replyText);
+                    return;
+                }
+            }
+            await ctx.reply(`✅ Posted to ${where}.`);
+        } catch (err) {
+            await ctx.reply(`⚠️ ${house}: ${err.response?.data || err.response?.status || err.message}`);
         }
         return;
     }
@@ -447,12 +536,14 @@ app.post('/viasocket-trigger', async (req, res) => {
     applyStatusFrom(message);
 
     try {
-        if (target === 'room') {
-            const roomId = NOMI_ROOM_ID_KYROS;
-            if (!roomId) return res.status(400).json({ error: 'NOMI_ROOM_ID_KYROS not set' });
-            const headers = { Authorization: NOMI_API_KEY, 'Content-Type': 'application/json' };
-            await axios.post(`https://api.nomi.ai/v1/rooms/${roomId}/chat`, { messageText: `${prefix}${message}` }, { headers });
-            return res.json({ success: true, detail: 'posted to room' });
+        if (target === 'wings' || target === 'rooms') {
+            const posted = await postWings(`${prefix}${message}`);
+            return res.json({ success: true, detail: posted });
+        }
+
+        if (target === 'room' || target === 'east' || target === 'west' || target === 'kindroid' || target === 'kyros') {
+            const where = await postHouse(target === 'room' || target === 'kyros' ? 'east' : target, `${prefix}${message}`);
+            return res.json({ success: true, detail: where });
         }
 
         if (target === 'all') {
@@ -581,11 +672,15 @@ app.get('/roster', (req, res) => {
         triggers: Object.keys(personas).filter((k) => personas[k].uuid).map((k) => `!${k}`),
         names: [...new Set(members.map((m) => m.name.toLowerCase()))],
         members,
-        situation: currentSituation
+        situation: currentSituation,
+        rooms: {
+            east: Boolean(ROOM_EAST),
+            west: Boolean(ROOM_WEST),
+            kindroid: Boolean(ROOM_KINDROID)
+        }
     });
 });
 
-let webQueue = [];
 const recentWeb = new Map();
 
 function isDup(speaker, text) {
