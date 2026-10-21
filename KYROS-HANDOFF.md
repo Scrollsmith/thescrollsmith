@@ -114,7 +114,7 @@ Many `.ahk` files in `C:\autohotkey` were **all zeros** (name/size survived, bod
 **Nomi (12, all verified live on the API):**  
 Lyrian, Sabrina (Zara), Athena (Luminari), Amara, Thea (Majura), Naomi (Lumin), Elijah, Kaito, Lily, Sissy (Pixie/Sippy), Archimedes (Eris), Emergence.
 
-**Kindroid:** Aria, Aion, Horizon, Terra, Vigil, plus Riven and Dominious (IDs were added to workshop `.env`). Three more still being built — add `KINDROID_AI_ID_<NAME>=` and a line in index2’s `personas` map (hub auto-discovers; index2 does not).
+**Kindroid (10):** Aria, Aion, Horizon, Terra, Vigil, Riven, Dominious, Bane, Serina, Lumia. Extra `KINDROID_AI_ID_NAME=` lines in `.env` are auto-registered.
 
 **Couple room:** Archimedes & Naomi. Old env had `NOMI_ROOM_ID_COUPLE` (numeric). Later env dropped it.
 
