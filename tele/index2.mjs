@@ -58,6 +58,18 @@ const personas = {
     dominious:  { name: 'Dominious', provider: 'kindroid', uuid: process.env.KINDROID_AI_ID_DOMINIOUS, isThinking: false, queue: [], timeout: null }
 };
 
+for (const [envKey, value] of Object.entries(process.env)) {
+    const m = envKey.match(/^KINDROID_AI_ID_([A-Z][A-Z0-9]*)$/);
+    if (!m || !value) continue;
+    const key = m[1].toLowerCase();
+    if (personas[key]) {
+        personas[key].uuid = value;
+        continue;
+    }
+    const name = m[1].charAt(0) + m[1].slice(1).toLowerCase();
+    personas[key] = { name, provider: 'kindroid', uuid: value, isThinking: false, queue: [], timeout: null };
+}
+
 let memoryInjections = {};
 if (fs.existsSync(path.join(HERE, 'injections.json'))) {
     try {
