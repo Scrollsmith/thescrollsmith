@@ -1,12 +1,17 @@
 // ==UserScript==
 // @name         Kyros Wings
 // @namespace    kyros
-// @version      1.0
-// @description  One tab = one room (East / West / Kindroid). Polls the router and types schedule lines into the chat box. No Nomi/Kindroid room IDs.
+// @version      1.1
+// @description  One tab = one room (East / West / Kindroid). Polls the router and types schedule lines into the chat box.
 // @match        https://nomi.ai/*
 // @match        https://*.nomi.ai/*
 // @match        https://kindroid.ai/*
 // @match        https://*.kindroid.ai/*
+// @match        http://nomi.ai/*
+// @match        http://*.nomi.ai/*
+// @match        http://kindroid.ai/*
+// @match        http://*.kindroid.ai/*
+// @run-at       document-idle
 // @grant        GM_xmlhttpRequest
 // @connect      127.0.0.1
 // @connect      localhost
@@ -21,28 +26,56 @@
     let teaching = null;
 
     const bar = document.createElement('div');
-    bar.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:99999;background:#111;color:#eee;padding:8px;font:12px/1.4 sans-serif;border:1px solid #666;display:flex;gap:6px;flex-wrap:wrap;max-width:360px;align-items:center;';
-    document.documentElement.appendChild(bar);
+    bar.id = 'kyros-wings-bar';
+    bar.style.cssText = [
+        'position:fixed',
+        'top:8px',
+        'right:8px',
+        'z-index:2147483647',
+        'background:#111',
+        'color:#eee',
+        'padding:8px',
+        'font:13px/1.4 sans-serif',
+        'border:2px solid #9f9',
+        'display:flex',
+        'gap:6px',
+        'flex-wrap:wrap',
+        'max-width:420px',
+        'align-items:center',
+        'pointer-events:auto'
+    ].join(';');
+
+    function hold(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
 
     function btn(label, fn) {
-        const b = document.createElement('button');
+        const b = document.createElement('div');
         b.textContent = label;
-        b.style.cssText = 'cursor:pointer;background:#222;color:#eee;border:1px solid #555;padding:3px 7px;';
-        b.onclick = fn;
+        b.setAttribute('data-kyros-btn', label);
+        b.style.cssText = 'cursor:pointer;background:#222;color:#eee;border:1px solid #555;padding:6px 10px;user-select:none;';
+        b.addEventListener('pointerdown', function (e) {
+            hold(e);
+            fn();
+        }, true);
         bar.appendChild(b);
         return b;
     }
 
-    const status = document.createElement('span');
-    status.style.flex = '1 1 100%';
+    const status = document.createElement('div');
+    status.style.cssText = 'flex:1 1 100%;color:#9f9';
     bar.appendChild(status);
 
     function paint() {
         status.textContent = wing
-            ? `🏰 ${wing} → ${HOST}  box:${chatEl ? 'yes' : 'no'} send:${sendEl ? 'yes' : 'no'}`
-            : '🏰 pick this window: East / West / Kindroid';
-        [...bar.querySelectorAll('button')].forEach((b) => {
-            b.style.borderColor = b.textContent.toLowerCase() === wing ? '#9f9' : '#555';
+            ? 'THIS TAB = ' + wing.toUpperCase() + '  host ' + HOST
+            : 'CLICK EAST / WEST / KINDROID for this window';
+        bar.querySelectorAll('[data-kyros-btn]').forEach((b) => {
+            const key = b.getAttribute('data-kyros-btn').toLowerCase();
+            b.style.borderColor = key === wing ? '#9f9' : '#555';
+            b.style.background = key === wing ? '#143' : '#222';
         });
     }
 
@@ -52,20 +85,21 @@
         paint();
     }
 
-    btn('East', () => setWing('east'));
-    btn('West', () => setWing('west'));
-    btn('Kindroid', () => setWing('kindroid'));
-    btn('Teach box', () => {
+    btn('east', function () { setWing('east'); });
+    btn('west', function () { setWing('west'); });
+    btn('kindroid', function () { setWing('kindroid'); });
+    btn('teach box', function () {
         teaching = 'box';
-        status.textContent = 'Click the chat text box…';
+        status.textContent = 'Now click the chat text box';
     });
-    btn('Teach send', () => {
+    btn('teach send', function () {
         teaching = 'send';
-        status.textContent = 'Click the send button…';
+        status.textContent = 'Now click the send button';
     });
 
-    document.addEventListener('click', (e) => {
+    document.addEventListener('pointerdown', function (e) {
         if (!teaching) return;
+        if (bar.contains(e.target)) return;
         e.preventDefault();
         e.stopPropagation();
         if (teaching === 'box') chatEl = e.target;
@@ -83,7 +117,7 @@
     function typeLine(text) {
         const el = chatEl && document.contains(chatEl) ? chatEl : guessBox();
         if (!el) {
-            status.textContent = 'No chat box — click Teach box';
+            status.textContent = 'No chat box — click teach box, then the field';
             return false;
         }
         chatEl = el;
@@ -93,7 +127,7 @@
             document.execCommand('insertText', false, text);
         } else {
             const proto = el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
-            const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+            const setter = Object.getOwnPropertyDescriptor(proto, 'value') && Object.getOwnPropertyDescriptor(proto, 'value').set;
             if (setter) setter.call(el, text);
             else el.value = text;
             el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -108,44 +142,48 @@
     }
 
     function gm(opts) {
-        return new Promise((resolve, reject) => {
-            GM_xmlhttpRequest({
-                ...opts,
-                onload: resolve,
-                onerror: reject
-            });
+        return new Promise(function (resolve, reject) {
+            GM_xmlhttpRequest(Object.assign({}, opts, { onload: resolve, onerror: reject }));
         });
     }
 
     async function pickHost() {
-        for (const h of HOSTS) {
+        for (let i = 0; i < HOSTS.length; i++) {
             try {
-                const res = await gm({ method: 'GET', url: `${h}/roster` });
-                if (res.status === 200 && String(res.responseText).includes('triggers')) {
-                    HOST = h;
+                const res = await gm({ method: 'GET', url: HOSTS[i] + '/roster' });
+                if (res.status === 200 && String(res.responseText).indexOf('triggers') !== -1) {
+                    HOST = HOSTS[i];
                     return;
                 }
-            } catch { /* try next */ }
+            } catch (e) { /* next */ }
         }
     }
 
     async function poll() {
         if (!wing) return;
         try {
-            const res = await gm({ method: 'GET', url: `${HOST}/poll-web-queue?room=${encodeURIComponent(wing)}` });
+            const res = await gm({ method: 'GET', url: HOST + '/poll-web-queue?room=' + encodeURIComponent(wing) });
             const body = JSON.parse(res.responseText || '{}');
             const lines = Array.isArray(body.messages) ? body.messages : [];
-            for (const line of lines) {
-                typeLine(line);
-                await new Promise((r) => setTimeout(r, 800));
+            for (let i = 0; i < lines.length; i++) {
+                typeLine(lines[i]);
+                await new Promise(function (r) { setTimeout(r, 800); });
             }
             if (lines.length) paint();
-        } catch {
+        } catch (e) {
             status.textContent = 'index2 not reachable on 8081/8080';
         }
     }
 
+    function mount() {
+        if (!document.documentElement.contains(bar)) {
+            (document.body || document.documentElement).appendChild(bar);
+        }
+        paint();
+    }
+
+    mount();
+    setInterval(mount, 3000);
     pickHost().then(paint);
     setInterval(poll, 4000);
-    paint();
 })();
