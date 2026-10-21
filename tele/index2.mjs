@@ -624,7 +624,28 @@ function isMain() {
 }
 
 if (isMain()) {
-    app.listen(8080, () => console.log(`📡 Doorways on 8080  (payload cap ${MAX_PAYLOAD_CHARS})`));
+    const preferred = Number(process.env.KYROS_PORT || 8080);
+    const fallback = Number(process.env.KYROS_FALLBACK_PORT || 8081);
+
+    function startHttp(port, canFallback) {
+        const server = app.listen(port, () => {
+            console.log(`📡 Doorways on ${port}  (payload cap ${MAX_PAYLOAD_CHARS})`);
+            if (port !== 8080) {
+                console.log(`⚠️ left 8080 alone (OpenClaw). Scheduler/TM/ViaSocket for Kyros → http://127.0.0.1:${port}`);
+            }
+        });
+        server.on('error', (err) => {
+            if (err.code === 'EADDRINUSE' && canFallback && port !== fallback) {
+                console.warn(`⚠️ ${port} busy — not killing it. Kyros moving to ${fallback}`);
+                startHttp(fallback, false);
+                return;
+            }
+            console.error(`❌ cannot bind ${port}:`, err.message);
+            process.exit(1);
+        });
+    }
+
+    startHttp(preferred, !process.env.KYROS_PORT);
     bot.launch().then(() => console.log('🚀 Kyros router online — inclinations stripped, hive spoken-only'));
 }
 

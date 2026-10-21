@@ -16,7 +16,7 @@ This conversation: https://cursor.com/agents/bc-68c4d974-2e0d-48e0-8684-c4aaf1e6
 
 ## The stack you should run (live box)
 
-On the live box (`C:\users\user\tele`), copy the new `tele\` files next to your live `.env`, then **double-click `START-LIVE.cmd`**. That kills whatever is already on 8080, starts `index2.mjs`, waits for the port, then starts `kyros_scheduler.mjs`.
+On the live box (`C:\users\user\tele`), copy the new `tele\` files next to your live `.env`, then **double-click `START-LIVE.cmd`**. It does **not** touch port 8080 (OpenClaw). If 8080 is taken, Kyros binds **8081**. `STOP-LIVE.cmd` only kills `index2.mjs` / `kyros_scheduler.mjs`.
 
 Still needed around it:
 

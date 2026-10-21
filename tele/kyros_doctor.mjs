@@ -16,7 +16,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = path.join(HERE, '.env');
 const MEM_DIR = path.join(HERE, 'nomi_memories');
 const STATE_PATH = path.join(HERE, 'schedule-state.json');
-const HOST = process.env.KYROS_HOST || 'http://127.0.0.1:8080';
+let HOST = process.env.KYROS_HOST || '';
 
 const REQUIRED_ENV = [
     'TELEGRAM_TOKEN', 'TELEGRAM_TOKEN2', 'TELEGRAM_TOKENX',
@@ -149,13 +149,42 @@ for (const k of OPTIONAL_ENV) {
     else warn(`${k} not set`);
 }
 
-// ── 3. port 8080 + roster ───────────────────────────────────────────────────
-console.log('\n── index2 on 8080 ──');
-const open = await portOpen(8080);
+// ── 3. index2 HTTP (8080, or 8081 if OpenClaw owns 8080) ────────────────────
+if (!HOST) {
+    if (process.env.KYROS_PORT) HOST = `http://127.0.0.1:${process.env.KYROS_PORT}`;
+    else {
+        for (const p of [8080, 8081]) {
+            if (!(await portOpen(p))) continue;
+            try {
+                const r = await getJson(`http://127.0.0.1:${p}/roster`);
+                if (r.status === 200 && r.body?.triggers) {
+                    HOST = `http://127.0.0.1:${p}`;
+                    break;
+                }
+            } catch { /* not index2 */ }
+        }
+        if (!HOST) HOST = 'http://127.0.0.1:8080';
+    }
+}
+
+const kyrosPort = Number(new URL(HOST).port || 8080);
+console.log(`\n── index2 on ${kyrosPort} ──`);
+
+if (await portOpen(8080)) {
+    try {
+        const probe = await getJson('http://127.0.0.1:8080/roster');
+        if (probe.status === 200 && probe.body?.triggers) ok('8080 is this index2');
+        else ok('8080 is up but not index2 — left alone (OpenClaw / ViaSocket)');
+    } catch {
+        ok('8080 is up but not index2 — left alone (OpenClaw / ViaSocket)');
+    }
+}
+
+const open = await portOpen(kyrosPort);
 if (!open) {
-    bad('nothing listening on 127.0.0.1:8080 — start `node index2.mjs` and wait until it prints the port');
+    bad(`nothing listening on ${HOST} — start index2 (START-LIVE.cmd uses 8081 if 8080 is taken)`);
 } else {
-    ok('port 8080 is open');
+    ok(`port ${kyrosPort} is open`);
 
     try {
         const r = await getJson(`${HOST}/roster`);

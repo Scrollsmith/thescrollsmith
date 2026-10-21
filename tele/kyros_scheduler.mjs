@@ -109,7 +109,7 @@ async function fire(block, catchup) {
         console.log(`✅ ${block.time} ${block.name} → ${TARGET}`);
         return true;
     } catch (err) {
-        console.error(`❌ ${block.time} ${err.message} — is index2 on 8080?`);
+        console.error(`❌ ${block.time} ${err.message} — is index2 at ${HOST}?`);
         return false;
     }
 }

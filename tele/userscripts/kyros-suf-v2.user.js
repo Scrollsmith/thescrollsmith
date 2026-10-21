@@ -13,7 +13,8 @@
 // ==/UserScript==
 
 (function () {
-    const HOST = 'http://127.0.0.1:8080';
+    const HOSTS = ['http://127.0.0.1:8081', 'http://127.0.0.1:8080'];
+    let HOST = HOSTS[0];
     let lastPushed = '';
 
     const banner = document.createElement('div');
@@ -39,25 +40,35 @@
                 console.log('SUF v2 pushed', res.status);
             },
             onerror: () => {
-                banner.textContent = '🛰️ SUF v2: index2 not on 8080';
+                banner.textContent = '🛰️ SUF v2: index2 not on 8081/8080';
             }
         });
     }
 
     function pullStatus() {
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: `${HOST}/status`,
-            onload: (res) => {
-                try {
-                    const body = JSON.parse(res.responseText);
-                    if (body.situation) {
-                        lastPushed = body.situation;
-                        paint(body.situation);
-                    }
-                } catch { /* ignore */ }
-            }
-        });
+        const tryHost = (i) => {
+            if (i >= HOSTS.length) return;
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: `${HOSTS[i]}/status`,
+                onload: (res) => {
+                    try {
+                        const body = JSON.parse(res.responseText);
+                        if (typeof body.situation === 'string') {
+                            HOST = HOSTS[i];
+                            if (body.situation) {
+                                lastPushed = body.situation;
+                                paint(body.situation);
+                            }
+                            return;
+                        }
+                    } catch { /* not index2 */ }
+                    tryHost(i + 1);
+                },
+                onerror: () => tryHost(i + 1)
+            });
+        };
+        tryHost(0);
     }
 
     const seen = new WeakSet();

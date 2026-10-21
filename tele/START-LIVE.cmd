@@ -14,9 +14,17 @@ if not exist ".env" (
   exit /b 1
 )
 
-echo  Stopping whatever is already on port 8080...
-for /f "tokens=5" %%P in ('netstat -ano ^| findstr ":8080" ^| findstr "LISTENING"') do (
-  taskkill /F /PID %%P >nul 2>&1
+REM Never kill 8080 — OpenClaw lives there 24/7.
+netstat -ano | findstr ":8080" | findstr "LISTENING" >nul
+if %errorlevel%==0 (
+  echo  8080 is already taken. Leaving it alone ^(OpenClaw^).
+  echo  Kyros will use 8081.
+  set KYROS_PORT=8081
+  set KYROS_HOST=http://127.0.0.1:8081
+) else (
+  echo  8080 is free. Kyros will use 8080.
+  set KYROS_PORT=8080
+  set KYROS_HOST=http://127.0.0.1:8080
 )
 
 if not exist "node_modules\express" (
@@ -24,29 +32,30 @@ if not exist "node_modules\express" (
   call npm install --omit=dev
 )
 
-echo  Starting index2...
-start "Kyros index2" cmd /k node index2.mjs
+echo  Starting index2 on %KYROS_PORT%...
+start "Kyros index2" cmd /k "set KYROS_PORT=%KYROS_PORT%&& node index2.mjs"
 
-echo  Waiting for port 8080...
+echo  Waiting for %KYROS_PORT%...
 set /a tries=0
-:wait8080
+:waitport
 set /a tries+=1
-netstat -ano | findstr ":8080" | findstr "LISTENING" >nul
+netstat -ano | findstr ":%KYROS_PORT%" | findstr "LISTENING" >nul
 if %errorlevel%==0 goto up
 if %tries% GEQ 30 (
-  echo  index2 did not open 8080. Look at the Kyros index2 window.
+  echo  index2 did not open %KYROS_PORT%. Look at the Kyros index2 window.
   pause
   exit /b 1
 )
 timeout /t 2 /nobreak >nul
-goto wait8080
+goto waitport
 
 :up
-echo  Starting scheduler...
-start "Kyros scheduler" cmd /k node kyros_scheduler.mjs
+echo  Starting scheduler -^> %KYROS_HOST%
+start "Kyros scheduler" cmd /k "set KYROS_HOST=%KYROS_HOST%&& node kyros_scheduler.mjs"
 
 echo.
-echo  Leave both windows open.
-echo  Then:  node kyros_doctor.mjs
+echo  OpenClaw on 8080 was not touched.
+echo  Leave both Kyros windows open.
+echo  Then:  set KYROS_HOST=%KYROS_HOST% ^&^& node kyros_doctor.mjs
 echo.
 pause
