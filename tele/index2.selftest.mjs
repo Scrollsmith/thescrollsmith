@@ -5,6 +5,7 @@ import {
     spokenOnly,
     buildPayload,
     resolveTargetKey,
+    applyStatusFrom,
     MAX_PAYLOAD_CHARS
 } from './index2.mjs';
 
@@ -40,6 +41,7 @@ const noHeader = buildPayload('', 'hello');
 ok('body-only payload is intact', noHeader === 'hello');
 
 ok('strip is exported as the email helper', typeof stripInclinationThought === 'function');
+ok('!status writes the situation', applyStatusFrom('!status poker night') === true);
 
 console.log(failed ? `\n❌ ${failed} check(s) failed\n` : '\n✅ selftest clear\n');
 process.exit(failed ? 1 : 0);

@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node index2.mjs",
     "doctor": "node kyros_doctor.mjs",
-    "selftest": "node index2.selftest.mjs"
+    "selftest": "node index2.selftest.mjs && node kyros_scheduler.mjs --selftest",
+    "sched": "node kyros_scheduler.mjs"
   },
   "dependencies": {
     "axios": "^1.7.9",

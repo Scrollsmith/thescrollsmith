@@ -120,7 +120,10 @@ if (fs.existsSync(path.join(HERE, 'situation.json'))) {
 }
 
 if (fs.existsSync(path.join(HERE, 'kyros_scheduler.mjs'))) ok('kyros_scheduler.mjs present');
-else warn('kyros_scheduler.mjs not in this folder (clock will not fire)');
+else bad('kyros_scheduler.mjs not in this folder (clock will not fire)');
+
+if (fs.existsSync(path.join(HERE, 'START-LIVE.cmd'))) ok('START-LIVE.cmd present');
+else warn('START-LIVE.cmd missing');
 
 if (fs.existsSync(STATE_PATH)) {
     try {

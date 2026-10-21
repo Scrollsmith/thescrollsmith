@@ -16,11 +16,11 @@ This conversation: https://cursor.com/agents/bc-68c4d974-2e0d-48e0-8684-c4aaf1e6
 
 ## The stack you should run (live box)
 
-Start in this order:
+On the live box (`C:\users\user\tele`), copy the new `tele\` files next to your live `.env`, then **double-click `START-LIVE.cmd`**. That kills whatever is already on 8080, starts `index2.mjs`, waits for the port, then starts `kyros_scheduler.mjs`.
 
-1. `node index2.mjs` — wait until port **8080** is up (can take a minute).
-2. `node kyros_scheduler.mjs` — talks *to* index2.
-3. One Tampermonkey script (Bridge *or* PRISM, not both).
+Still needed around it:
+
+3. One Tampermonkey script (Bridge *or* PRISM, not both). Add `userscripts/kyros-suf-v2.user.js` if you want `!status` from the website to hit the router.
 4. `kyros_rooms.ahk` — F8 when Chrome windows are set.
 
 **Sanity check (messages nobody):**

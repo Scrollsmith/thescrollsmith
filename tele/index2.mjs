@@ -475,6 +475,18 @@ app.post('/kyros-echo-trigger', async (req, res) => {
     }
 });
 
+app.get('/status', (req, res) => {
+    res.json({ situation: currentSituation });
+});
+
+app.post('/status', (req, res) => {
+    const text = String(req.body?.text || req.body?.message || '').trim();
+    if (!text) return res.status(400).json({ error: 'text required' });
+    currentSituation = text.slice(0, 80);
+    saveSituation();
+    res.json({ success: true, situation: currentSituation });
+});
+
 app.post('/inject-memory', (req, res) => {
     const { target, memoryText, turns } = req.body || {};
     if (!target || !memoryText) return res.status(400).json({ error: 'target + memoryText' });
