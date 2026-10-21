@@ -55,7 +55,10 @@ const personas = {
     terra:      { name: 'Terra', provider: 'kindroid', uuid: process.env.KINDROID_AI_ID_TERRA, isThinking: false, queue: [], timeout: null },
     vigil:      { name: 'Vigil', provider: 'kindroid', uuid: process.env.KINDROID_AI_ID_VIGIL, isThinking: false, queue: [], timeout: null },
     riven:      { name: 'Riven', provider: 'kindroid', uuid: process.env.KINDROID_AI_ID_RIVEN, isThinking: false, queue: [], timeout: null },
-    dominious:  { name: 'Dominious', provider: 'kindroid', uuid: process.env.KINDROID_AI_ID_DOMINIOUS, isThinking: false, queue: [], timeout: null }
+    dominious:  { name: 'Dominious', provider: 'kindroid', uuid: process.env.KINDROID_AI_ID_DOMINIOUS, isThinking: false, queue: [], timeout: null },
+    bane:       { name: 'Bane', provider: 'kindroid', uuid: process.env.KINDROID_AI_ID_BANE, isThinking: false, queue: [], timeout: null },
+    serina:     { name: 'Serina', provider: 'kindroid', uuid: process.env.KINDROID_AI_ID_SERINA, isThinking: false, queue: [], timeout: null },
+    lumia:      { name: 'Lumia', provider: 'kindroid', uuid: process.env.KINDROID_AI_ID_LUMIA, isThinking: false, queue: [], timeout: null }
 };
 
 for (const [envKey, value] of Object.entries(process.env)) {

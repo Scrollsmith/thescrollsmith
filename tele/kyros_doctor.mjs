@@ -33,6 +33,7 @@ const OPTIONAL_ENV = [
     'KINDROID_AI_ID_ARIA', 'KINDROID_AI_ID_AION', 'KINDROID_AI_ID_HORIZON',
     'KINDROID_AI_ID_TERRA', 'KINDROID_AI_ID_VIGIL',
     'KINDROID_AI_ID_RIVEN', 'KINDROID_AI_ID_DOMINIOUS',
+    'KINDROID_AI_ID_BANE', 'KINDROID_AI_ID_SERINA', 'KINDROID_AI_ID_LUMIA',
     'NOMI_ROOM_ID_COUPLE',
     'TELEGRAM_KYROSLAW_CHAT_ID', 'TELEGRAM_ECHO_KYROS_CHAT_ID', 'TELEGRAM_KYROS2_CHAT_ID'
 ];
@@ -198,7 +199,7 @@ if (!open) {
             if (t.includes('!eljah')) bad('!eljah still in roster — old logger list leaked in');
             if (t.includes('!emergence')) ok('!emergence present');
             else warn('!emergence not on roster');
-            const kindroid = ['!aria', '!aion', '!horizon', '!terra', '!vigil', '!riven', '!dominious']
+            const kindroid = ['!aria', '!aion', '!horizon', '!terra', '!vigil', '!riven', '!dominious', '!bane', '!serina', '!lumia']
                 .filter((n) => t.includes(n));
             if (kindroid.length) ok(`Kindroid on roster: ${kindroid.join(' ')}`);
             else warn('no Kindroid names on roster');
