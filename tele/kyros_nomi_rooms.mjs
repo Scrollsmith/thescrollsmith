@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Read-only. Lists Nomi rooms so you can fill NOMI_ROOM_ID_EAST / WEST.
+// Optional. Nomi often will not give a usable room id until the room is gone.
+// Live path is Tampermonkey kyros-wings.user.js, not these ids.
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

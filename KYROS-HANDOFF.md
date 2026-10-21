@@ -20,7 +20,7 @@ On the live box (`C:\users\user\tele`), copy the new `tele\` files next to your 
 
 Still needed around it:
 
-3. One Tampermonkey script (Bridge *or* PRISM, not both). Add `userscripts/kyros-suf-v2.user.js` if you want `!status` from the website to hit the router.
+3. Tampermonkey: `userscripts/kyros-wings.user.js` in **all three** room windows (East, West, Kindroid). Optional: SUF v2. Do not also run old Bridge+PRISM together with Wings unless you know why.
 4. `kyros_rooms.ahk` — F8 when Chrome windows are set.
 
 **Sanity check (messages nobody):**
@@ -118,7 +118,7 @@ Lyrian, Sabrina (Zara), Athena (Luminari), Amara, Thea (Majura), Naomi (Lumin), 
 
 **Couple room:** Archimedes & Naomi. Old env had `NOMI_ROOM_ID_COUPLE` (numeric). Later env dropped it.
 
-**Rooms (3):** East Wing (Nomi API), West Wing (Nomi API), Kindroid group (`KINDROID_GROUP_ID`). Scheduler default `target: wings` posts the clock to all three. Telegram: `/east` `/west` `/kindroid` `/wings`. `node kyros_nomi_rooms.mjs` lists Nomi room ids. Kindroid group still falls back to the Bridge web-queue / AHK if the group API rejects.
+**Rooms (3):** East Wing, West Wing, Kindroid. Nomi/Kindroid **room IDs are unusable** (Nomi only surfaces them after the room is gone). Scheduler queues each cue three times; `userscripts/kyros-wings.user.js` in each Chrome window types it. Mark the tab East / West / Kindroid once. Telegram: `/east` `/west` `/kindroid` `/wings`.
 
 **Telegram bots:** TOKEN = @Lyriansbot, TOKEN2 = @Nomikyrosbot (index2), TOKENX = @KyrosTalkBot (unused / hub).
 

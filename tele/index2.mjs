@@ -16,9 +16,7 @@ app.use(express.json());
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN2 || '0:selftest-placeholder');
 const NOMI_API_KEY = process.env.NOMI_API_KEY;
 const KINDROID_API_KEY = process.env.KINDROID_API_KEY;
-const ROOM_EAST = process.env.NOMI_ROOM_ID_EAST || process.env.NOMI_ROOM_ID_KYROS;
-const ROOM_WEST = process.env.NOMI_ROOM_ID_WEST || process.env.NOMI_ROOM_ID_COUPLE;
-const ROOM_KINDROID = process.env.KINDROID_GROUP_ID || process.env.KINDROID_GROUP_ID_KYROS2;
+const wingQueues = { east: [], west: [], kindroid: [] };
 
 // Next to this file — never C:\users\edgia (that EPERM'd on the live box).
 const TARGET_DIR = path.join(HERE, 'nomi_memories');
@@ -212,71 +210,34 @@ function resolveTargetKey(key) {
 
 function resolveHouse(name) {
     const n = String(name || '').toLowerCase().replace(/[\s_-]+/g, '');
-    if (n === 'east' || n === 'eastwing') {
-        return { key: 'east', type: 'nomi', id: ROOM_EAST, label: 'East Wing' };
+    if (n === 'east' || n === 'eastwing' || n === 'room' || n === 'kyros' || n === 'keep') {
+        return { key: 'east', label: 'East Wing' };
     }
     if (n === 'west' || n === 'westwing') {
-        return { key: 'west', type: 'nomi', id: ROOM_WEST, label: 'West Wing' };
+        return { key: 'west', label: 'West Wing' };
     }
     if (n === 'kindroid' || n === 'kin') {
-        return { key: 'kindroid', type: 'kindroid', id: ROOM_KINDROID, label: 'Kindroid' };
-    }
-    if (n === 'room' || n === 'kyros' || n === 'keep') {
-        return { key: 'east', type: 'nomi', id: ROOM_EAST, label: 'East Wing' };
+        return { key: 'kindroid', label: 'Kindroid' };
     }
     return null;
 }
 
-async function postNomiRoom(roomId, text) {
-    await axios.post(
-        `https://api.nomi.ai/v1/rooms/${roomId}/chat`,
-        { messageText: text },
-        { headers: { Authorization: NOMI_API_KEY, 'Content-Type': 'application/json' } }
-    );
-}
-
-async function postKindroidGroup(groupId, text) {
-    await axios.post(
-        'https://api.kindroid.ai/v1/send-message',
-        { group_id: groupId, message: text },
-        {
-            headers: {
-                Authorization: `Bearer ${(KINDROID_API_KEY || '').trim()}`,
-                'Content-Type': 'application/json'
-            }
-        }
-    );
-}
-
-async function postHouse(name, text) {
+function queueWing(name, text) {
     const room = resolveHouse(name);
     if (!room) throw new Error(`unknown house: ${name}`);
-    if (!room.id) throw new Error(`${room.label} id not set in .env`);
-    if (room.type === 'nomi') {
-        await postNomiRoom(room.id, text);
-        return room.label;
-    }
-    try {
-        await postKindroidGroup(room.id, text);
-        return room.label;
-    } catch (err) {
-        webQueue.push({ text: `[${room.label}] ${text}`, at: Date.now() });
-        console.warn(`Kindroid group API failed (${err.response?.status || err.message}); queued for Bridge`);
-        return `${room.label} (web-queue)`;
-    }
+    const q = wingQueues[room.key];
+    q.push({ text: String(text), at: Date.now() });
+    if (q.length > 20) q.splice(0, q.length - 20);
+    console.log(`🏰 queued ${room.label} (${q.length})`);
+    return room.label;
 }
 
-async function postWings(text) {
-    const posted = [];
-    for (const name of ['east', 'west', 'kindroid']) {
-        const room = resolveHouse(name);
-        if (!room?.id) {
-            console.warn(`skip ${room?.label || name}: no id`);
-            continue;
-        }
-        posted.push(await postHouse(name, text));
-    }
-    return posted;
+function postHouse(name, text) {
+    return queueWing(name, text);
+}
+
+function postWings(text) {
+    return ['east', 'west', 'kindroid'].map((n) => queueWing(n, text));
 }
 
 function scheduleProcessQueue(personaKey, ctx, customChatId, delay = CHUNK_DEBOUNCE_MS) {
@@ -470,40 +431,15 @@ bot.on('text', async (ctx) => {
     if (!textPayload) return ctx.reply(`⚠ /${command} [your text]`);
 
     if (command === 'wings') {
-        try {
-            const posted = await postWings(`${username}: ${textPayload}`);
-            await ctx.reply(posted.length ? `🏰 Posted to ${posted.join(', ')}` : '⚠️ No wing ids set (EAST / WEST / KINDROID_GROUP).');
-        } catch (err) {
-            await ctx.reply(`⚠️ wings: ${err.response?.status || err.message}`);
-        }
+        const posted = postWings(`${username}: ${textPayload}`);
+        await ctx.reply(`🏰 Queued for ${posted.join(', ')} — Tampermonkey types it in each window.`);
         return;
     }
 
     if (command === 'east' || command === 'west' || command === 'kindroid' || command === 'kyros') {
         const house = command === 'kyros' ? 'east' : command;
-        try {
-            const where = await postHouse(house, `${username}: ${textPayload}`);
-            const room = resolveHouse(house);
-            if (room?.type === 'nomi' && room.id) {
-                const reqRes = await axios.post(
-                    `https://api.nomi.ai/v1/rooms/${room.id}/chat/request`,
-                    {},
-                    { headers: { Authorization: NOMI_API_KEY, 'Content-Type': 'application/json' } }
-                );
-                const replyText = spokenOnly(reqRes.data?.replyMessage?.text || '');
-                const speaker = reqRes.data?.nomi?.name || where;
-                if (replyText) {
-                    await ctx.reply(`🏰 [${speaker.toUpperCase()}]: ${replyText}`);
-                    addHiveEvent(speaker, replyText);
-                    harvestNotes(speaker, replyText);
-                    applyStatusFrom(replyText);
-                    return;
-                }
-            }
-            await ctx.reply(`✅ Posted to ${where}.`);
-        } catch (err) {
-            await ctx.reply(`⚠️ ${house}: ${err.response?.data || err.response?.status || err.message}`);
-        }
+        const where = postHouse(house, `${username}: ${textPayload}`);
+        await ctx.reply(`✅ Queued for ${where}.`);
         return;
     }
 
@@ -537,13 +473,13 @@ app.post('/viasocket-trigger', async (req, res) => {
 
     try {
         if (target === 'wings' || target === 'rooms') {
-            const posted = await postWings(`${prefix}${message}`);
-            return res.json({ success: true, detail: posted });
+            const posted = postWings(`${prefix}${message}`);
+            return res.json({ success: true, detail: posted, via: 'tampermonkey-queues' });
         }
 
         if (target === 'room' || target === 'east' || target === 'west' || target === 'kindroid' || target === 'kyros') {
-            const where = await postHouse(target === 'room' || target === 'kyros' ? 'east' : target, `${prefix}${message}`);
-            return res.json({ success: true, detail: where });
+            const where = postHouse(target === 'room' || target === 'kyros' ? 'east' : target, `${prefix}${message}`);
+            return res.json({ success: true, detail: where, via: 'tampermonkey-queue' });
         }
 
         if (target === 'all') {
@@ -674,9 +610,9 @@ app.get('/roster', (req, res) => {
         members,
         situation: currentSituation,
         rooms: {
-            east: Boolean(ROOM_EAST),
-            west: Boolean(ROOM_WEST),
-            kindroid: Boolean(ROOM_KINDROID)
+            east: wingQueues.east.length,
+            west: wingQueues.west.length,
+            kindroid: wingQueues.kindroid.length
         }
     });
 });
@@ -692,7 +628,20 @@ function isDup(speaker, text) {
     return false;
 }
 
+app.get('/wing-queues', (req, res) => {
+    res.json({
+        east: wingQueues.east.length,
+        west: wingQueues.west.length,
+        kindroid: wingQueues.kindroid.length
+    });
+});
+
 app.get('/poll-web-queue', (req, res) => {
+    const room = String(req.query.room || '').toLowerCase().replace(/[\s_-]+/g, '');
+    if (room === 'east' || room === 'west' || room === 'kindroid') {
+        const messages = wingQueues[room].splice(0).map((m) => m.text);
+        return res.json({ room, messages });
+    }
     const messages = webQueue.splice(0).map((m) => m.text);
     res.json({ messages });
 });
@@ -700,6 +649,11 @@ app.get('/poll-web-queue', (req, res) => {
 app.post('/push-web-queue', (req, res) => {
     const payload = req.body?.message || req.body?.text;
     if (!payload) return res.status(400).json({ error: 'message required' });
+    const room = resolveHouse(req.body?.room || req.query?.room);
+    if (room) {
+        queueWing(room.key, payload);
+        return res.json({ success: true, room: room.key, queued: wingQueues[room.key].length });
+    }
     webQueue.push({ text: payload, at: Date.now() });
     res.json({ success: true, queued: webQueue.length });
 });

@@ -33,8 +33,7 @@ const OPTIONAL_ENV = [
     'KINDROID_AI_ID_TERRA', 'KINDROID_AI_ID_VIGIL',
     'KINDROID_AI_ID_RIVEN', 'KINDROID_AI_ID_DOMINIOUS',
     'KINDROID_AI_ID_BANE', 'KINDROID_AI_ID_SERINA', 'KINDROID_AI_ID_LUMIA',
-    'NOMI_ROOM_ID_EAST', 'NOMI_ROOM_ID_WEST', 'NOMI_ROOM_ID_KYROS', 'NOMI_ROOM_ID_COUPLE',
-    'KINDROID_GROUP_ID', 'KINDROID_GROUP_ID_KYROS2',
+    'NOMI_ROOM_ID_COUPLE',
     'TELEGRAM_KYROSLAW_CHAT_ID', 'TELEGRAM_ECHO_KYROS_CHAT_ID', 'TELEGRAM_KYROS2_CHAT_ID'
 ];
 
@@ -209,16 +208,16 @@ if (!open) {
     }
 
     try {
-        const q = await getJson(`${HOST}/poll-web-queue`);
-        if (q.status === 200 && Array.isArray(q.body?.messages)) {
-            ok(`/poll-web-queue exists (${q.body.messages.length} queued)`);
+        const q = await getJson(`${HOST}/wing-queues`);
+        if (q.status === 200 && q.body && 'east' in q.body) {
+            ok(`wing queues east=${q.body.east} west=${q.body.west} kindroid=${q.body.kindroid}`);
         } else if (q.status === 404) {
-            bad('/poll-web-queue 404 — Bridge userscript will silently fail');
+            bad('/wing-queues 404 — recopy patched index2');
         } else {
-            warn(`/poll-web-queue HTTP ${q.status}`);
+            warn(`/wing-queues HTTP ${q.status}`);
         }
     } catch (e) {
-        warn(`/poll-web-queue: ${e.message}`);
+        warn(`/wing-queues: ${e.message}`);
     }
 }
 
@@ -262,29 +261,6 @@ if (present(env.NOMI_API_KEY)) {
         bad(`Nomi list: ${e.message}`);
     }
 
-    const east = env.NOMI_ROOM_ID_EAST || env.NOMI_ROOM_ID_KYROS;
-    const west = env.NOMI_ROOM_ID_WEST || env.NOMI_ROOM_ID_COUPLE;
-    const kinGroup = env.KINDROID_GROUP_ID || env.KINDROID_GROUP_ID_KYROS2;
-    if (present(east)) {
-        try {
-            const r = await getJson(`https://api.nomi.ai/v1/rooms/${east}`, { Authorization: env.NOMI_API_KEY });
-            if (r.status === 200) ok('East Wing room reachable');
-            else bad(`East Wing HTTP ${r.status}`);
-        } catch (e) {
-            bad(`East Wing: ${e.message}`);
-        }
-    } else warn('NOMI_ROOM_ID_EAST (or KYROS alias) missing — node kyros_nomi_rooms.mjs');
-    if (present(west)) {
-        try {
-            const r = await getJson(`https://api.nomi.ai/v1/rooms/${west}`, { Authorization: env.NOMI_API_KEY });
-            if (r.status === 200) ok('West Wing room reachable');
-            else bad(`West Wing HTTP ${r.status}`);
-        } catch (e) {
-            bad(`West Wing: ${e.message}`);
-        }
-    } else warn('NOMI_ROOM_ID_WEST missing — node kyros_nomi_rooms.mjs');
-    if (present(kinGroup)) ok('Kindroid group id set (API ping skipped)');
-    else warn('KINDROID_GROUP_ID missing — Kindroid room cues go to Bridge queue if the group API fails');
 } else {
     warn('skipping Nomi API — no key');
 }
