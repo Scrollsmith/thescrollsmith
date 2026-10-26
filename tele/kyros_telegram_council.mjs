@@ -327,7 +327,25 @@ const nomi = liveKeys().filter((k) => personas[k].platform === 'nomi').map((k) =
 console.log('Council Nomi: ' + (nomi.join(', ') || '(none)'));
 console.log('Council Kindroid: ' + (kin.join(', ') || '(none)'));
 console.log('KINDROID_API_KEY: ' + (KINDROID_API_KEY ? 'set' : 'MISSING'));
+if (!kin.length) console.error('No Kindroid IDs loaded — they will never speak.');
+
+console.log('contacting Telegram...');
+let botName = 'KyrosTalkBot';
+try {
+    const me = await bot.telegram.getMe();
+    botName = me.username || botName;
+    console.log('This bot is @' + botName + ' — talk to THIS one, not Nomikyrosbot.');
+} catch (err) {
+    console.error('Telegram getMe failed:', err.response?.description || err.message);
+    process.exit(1);
+}
 
 await bot.telegram.deleteWebhook({ drop_pending_updates: true }).catch(() => {});
-await bot.launch();
-console.log('Kyros Council ready on TOKENX. /start_council /stop_council /status /who');
+try {
+    await bot.launch();
+} catch (err) {
+    console.error('Telegram launch failed:', err.response?.description || err.message);
+    console.error('If it says 409, another process is already using this same token.');
+    process.exit(1);
+}
+console.log('Kyros Council ready. In Telegram: /who@' + botName + ' then /start_council@' + botName);
