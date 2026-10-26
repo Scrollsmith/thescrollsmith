@@ -67,24 +67,49 @@ const personas = {
 
 const EXPECTED_KINDROID = ['aria', 'aion', 'horizon', 'terra', 'vigil', 'riven', 'dominious', 'bane', 'serina', 'lumia'];
 
+function readEnvFileText(envPath) {
+    const buf = fs.readFileSync(envPath);
+    if ((buf[0] === 0xFF && buf[1] === 0xFE) || buf.includes(0)) {
+        return buf.toString('utf16le').replace(/^\uFEFF/, '');
+    }
+    return buf.toString('utf8').replace(/^\uFEFF/, '');
+}
+
+function kindroidNameFromKey(k) {
+    const compact = k.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    for (const name of EXPECTED_KINDROID) {
+        const n = name.toUpperCase();
+        if (compact === 'KINDROIDAIID' + n || compact === 'KINDROIDID' + n || compact.endsWith(n) && compact.includes('KINDROID')) {
+            return name;
+        }
+    }
+    const m = k.match(/KINDROID_(?:AI_)?ID_([A-Za-z][A-Za-z0-9_]*)/i);
+    return m ? m[1].toLowerCase() : null;
+}
+
 function loadKindroidIdsFromFile() {
     const filled = [];
     const empty = [];
+    const present = [];
+    const rawKeys = [];
     const map = {};
     const envPath = path.join(HERE, '.env');
-    if (!fs.existsSync(envPath)) return { filled, empty, present: [], map };
-    const text = fs.readFileSync(envPath, 'utf8').replace(/^\uFEFF/, '');
-    const present = [];
+    if (!fs.existsSync(envPath)) return { filled, empty, present, rawKeys, map, envPath, exists: false };
+    const text = readEnvFileText(envPath);
     for (const raw of text.split(/\r?\n/)) {
-        const line = raw.trim();
+        const line = raw.replace(/^\uFEFF/, '').trim();
         if (!line || line.startsWith('#')) continue;
-        const i = line.indexOf('=');
-        if (i < 1) continue;
-        const k = line.slice(0, i).trim();
-        const val = trimId(line.slice(i + 1));
-        const m = k.match(/^KINDROID_(?:AI_)?ID_([A-Za-z][A-Za-z0-9_]*)$/i);
-        if (!m) continue;
-        const key = m[1].toLowerCase();
+        if (!/kindroid/i.test(line)) continue;
+        const cut = line.search(/[=:]/);
+        if (cut < 1) {
+            rawKeys.push(line.slice(0, 60));
+            continue;
+        }
+        const k = line.slice(0, cut).trim().replace(/^export\s+/i, '');
+        const val = trimId(line.slice(cut + 1).split(/\s+#/)[0]);
+        rawKeys.push(k);
+        const key = kindroidNameFromKey(k);
+        if (!key) continue;
         present.push(key);
         if (!val) {
             empty.push(key);
@@ -93,7 +118,7 @@ function loadKindroidIdsFromFile() {
         map[key] = val;
         filled.push(key);
     }
-    return { filled, empty, present, map };
+    return { filled, empty, present, rawKeys, map, envPath, exists: true };
 }
 
 const kindroidEnv = loadKindroidIdsFromFile();
@@ -847,6 +872,8 @@ if (isMain()) {
     const kinMiss = [...new Set(Object.values(personas).filter((p) => p.provider === 'kindroid' && !p.uuid).map((p) => p.name))];
     const notInFile = EXPECTED_KINDROID.filter((n) => !kindroidEnv.present.includes(n));
     console.log('Kindroid API key: ' + (KINDROID_API_KEY ? 'set' : 'MISSING'));
+    console.log('Kindroid .env path: ' + (kindroidEnv.envPath || path.join(HERE, '.env')));
+    console.log('Kindroid .env key names: ' + (kindroidEnv.rawKeys.join(', ') || '(none)'));
     console.log('Kindroid .env filled: ' + (kindroidEnv.filled.join(', ') || '(none)'));
     console.log('Kindroid .env empty: ' + (kindroidEnv.empty.join(', ') || '(none)'));
     console.log('Kindroid .env missing lines: ' + (notInFile.join(', ') || '(none)'));
