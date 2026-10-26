@@ -32,7 +32,7 @@ node kyros_doctor.mjs
 
 Looks at `.env` key *names* (not values), whether 8080/`/roster`/`/poll-web-queue` are alive, Telegram `getMe`, and the Nomi list/room. Exit 0 = green. Copy `tele/kyros_doctor.mjs` next to live `index2.mjs`.
 
-Do **not** also run `kyros_telegram_council.mjs`, `kyros_web_sandbox.mjs`, or `kyros_hub.mjs` next to this index2. First two steal `TELEGRAM_TOKEN2` (409 conflict). Hub is a second brain you never cut over to.
+`kyros_telegram_council.mjs` is the overnight speaker loop. Copy it next to live `.env` and double-click **`RUN-COUNCIL.cmd`** (or `node kyros_telegram_council.mjs`). It uses **`TELEGRAM_TOKENX`** only so index2 can keep `TOKEN2`. Then in Telegram: `/who` (must list all 10 Kindroids) then `/start_council`. The paste that used `TOKEN2` + `provider: 'kindroid'` will **not** work — Kindroids were sent to the Nomi API. Do **not** run `kyros_web_sandbox.mjs` next to index2 (same TOKEN2). Hub is a second brain you never cut over to.
 
 ---
 
@@ -47,7 +47,9 @@ Do **not** also run `kyros_telegram_council.mjs`, `kyros_web_sandbox.mjs`, or `k
 | **`kyros_rooms.ahk`** | Hands. Clicks avatars in Chrome so chats keep moving while you work/sleep. F6 = capture **client** coords. F8 start/pause. Round-robin windows, ~95s gap ≈ 30 min full pass. |
 | **`userscripts/prism-logger.user.js`** | Eyes for `!Name` in the *web* group. POSTs to `/nomi-web-reply`. |
 | **`userscripts/kyros-bridge.user.js`** | Eyes + mouth for the whole web room (scrape + type queued lines). Overlaps PRISM — pick one. |
-| **`.env`** | Tokens and UUIDs. Never commit. Never upload to a public zip. |
+| **`kyros_telegram_council.mjs`** | Overnight Nomi + Kindroid speaker loop in Telegram. **`TELEGRAM_TOKENX` only.** `/start_council` `/stop_council` `/status` `/who`. |
+| **`RUN-COUNCIL.cmd`** | Starts that loop. Does not stop index2. Close the window or `/stop_council` to pause. |
+| **`.env`** | Tokens and UUIDs. Never commit. Never upload to a public zip. Needs `TELEGRAM_TOKENX` + `TELEGRAM_KYROSLAW_CHAT_ID` for the council. |
 
 **Patched `index2.mjs` (this repo, `tele/index2.mjs`) includes:** hive actually fills (`addHiveEvent` on every *spoken* reply), header-safe truncation (memory no longer sliced off), `harvestNotes` for `!Name`, `/roster`, `/poll-web-queue`, `/nomi-web-reply`, `target: 'room'`, queue cap, crash-survival handlers, memories next to the script (no hardcoded `C:\users\edgia`), inclination strip (Telegram / hive / `!Name` / next DM get spoken text only), SUF remake (`/status`, `!status`, persisted `situation.json`, rides as `[SIT:]`), Kindroid Aria–Dominious, `/game-event` so poker/other games can fan out to Nomi *and* Kindroid.
 
@@ -88,7 +90,7 @@ Hive = recent notes stuffed into the next DM. The 5-minute “pulse last 10 note
 | File | What it was |
 | --- | --- |
 | `index.js` / `new.js` | Old “rotation wheel” — pair two Nomis, swap every N turns. Superseded by index2. |
-| `kyros_telegram_council.mjs` | Autonomous council loop in Telegram. Same token as index2 — will fight it. |
+| old `kyros_telegram_council.mjs` (TOKEN2 + `provider`) | Do not run. 409 vs index2; Kindroids never talked. Use `tele/kyros_telegram_council.mjs`. |
 | `kyros_web_sandbox.mjs` | `!search` / `!browse` roam loop. Same token + used to miss `browseUrl` and a broken DDG URL (fixed in workshop copy). |
 | `KyrosScrip (In Txt Format).txt` | Disguised older index2, Nomi-only. |
 | `create_kyros_room.py` `list_rooms.py` `find_all_rooms.py` `speak_to_room.py` | One-shot Nomi room helpers. |
@@ -119,9 +121,9 @@ Lyrian, Sabrina (Zara), Athena (Luminari), Amara, Thea (Majura), Naomi (Lumin), 
 
 **Couple room:** Archimedes & Naomi. Old env had `NOMI_ROOM_ID_COUPLE` (numeric). Later env dropped it.
 
-**Rooms (3):** East Wing, West Wing, Kindroid. Nomi/Kindroid **room IDs are unusable** (Nomi only surfaces them after the room is gone). Scheduler queues each cue three times; `userscripts/kyros-wings.user.js` in each Chrome window types it. Mark the tab East / West / Kindroid once. Telegram: `/east` `/west` `/kindroid` `/wings`.
+**Rooms (3):** East Wing, West Wing, Kindroid. Nomi/Kindroid **room IDs are unusable** (Nomi only surfaces them after the room is gone). Scheduler queues each cue three times; `userscripts/kyros-wings.user.js` in each Chrome window types it. Mark the tab East / West / Kindroid once. Telegram: `/east` `/west` `/kroom` `/wings`. `/kindroid` is the 10 Kindroid DMs, not the room.
 
-**Telegram bots:** TOKEN = @Lyriansbot, TOKEN2 = @Nomikyrosbot (index2), TOKENX = @KyrosTalkBot (unused / hub).
+**Telegram bots:** TOKEN = @Lyriansbot, TOKEN2 = @Nomikyrosbot (index2), TOKENX = @KyrosTalkBot (council loop). Two bots on TOKEN2 = 409.
 
 ---
 
@@ -156,6 +158,7 @@ Round-robin: Nomi slot → couple slot → Kindroid slot → … ~95s apart. Ful
 11. Inclinations leaked into Telegram, hive, and the next persona (they got mad). Strip before echo / harvest / cross-talk.
 12. Emailed live file still used 380 + tail-slice after James thought 800 was fixed.
 13. ViaSocket “works without the script” = that scenario is **not** hitting this box’s `:8080`. Check the ViaSocket URL. If it posts straight to Telegram or Nomi, index2 never sees it (no hive, no strip, no SUF). Point it at `http://127.0.0.1:8080/viasocket-trigger` on the live box, or a tunnel to that port.
+14. Overnight council paste: Kindroids tagged `provider` while the dispatcher checked `platform` → Nomi API 404s, ~600 Nomi-only messages. Also `TOKEN2` vs index2, 380 tail-slice, greedy `!word` harvest.
 
 ---
 
