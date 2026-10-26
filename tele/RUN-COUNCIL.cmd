@@ -57,21 +57,15 @@ if errorlevel 1 (
 )
 echo  syntax ok
 echo.
-echo  starting council on TELEGRAM_TOKENX  (not TOKEN2)
+echo  Opening a window titled: Kyros council TOKENX
+echo  That window stays open even if the council dies.
 echo  index2 can stay running.
-echo  Leave this window OPEN. If you see Press any key, it already died.
 echo.
 
-call node kyros_telegram_council.mjs
-echo.
-echo  **********************************************
-echo  COUNCIL STOPPED  (exit code %errorlevel%)
-echo  That is NOT a successful start.
-echo  Read / screenshot the lines ABOVE this box.
-echo  **********************************************
-echo.
+start "Kyros council TOKENX" cmd /k "node kyros_telegram_council.mjs"
+echo  Look for the new black window. This starter can close.
 pause
-exit /b %errorlevel%
+exit /b 0
 
 :FAIL
 echo.
