@@ -2,25 +2,23 @@
 cd /d "%~dp0"
 echo.
 echo  folder: %cd%
+echo  Same window. No second window.
+echo  index2 can stay running.
 echo.
 
 if not exist ".env" (
-  echo  MISSING .env in this folder. Put this cmd in C:\users\user\tele
-  pause
-  exit /b 1
+  echo  MISSING .env — this cmd must sit in C:\users\user\tele
+  goto END
 )
-
 if not exist "kyros_telegram_council.mjs" (
   echo  MISSING kyros_telegram_council.mjs
-  echo  In PowerShell in this folder you can skip the cmd:
-  echo    node kyros_telegram_council.mjs
-  pause
-  exit /b 1
+  goto END
 )
 
-echo  Opening a window titled: Kyros council TOKENX
-echo  Look at the taskbar if you do not see it.
-echo  Leave THAT window open. This one can close.
+call node kyros_telegram_council.mjs
 echo.
-start "Kyros council TOKENX" cmd /k "node kyros_telegram_council.mjs"
+echo  COUNCIL STOPPED. The error is the lines above.
+
+:END
+echo.
 pause
