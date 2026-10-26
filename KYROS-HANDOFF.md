@@ -59,7 +59,8 @@ Copy `tele/index2.mjs` onto the live box, **stop the old Node process first** (s
 
 - `/<name> <msg>` — one persona (aliases: zara, lumin, pixie, …)
 - `/all <msg>` — everyone, de-duped by UUID
-- `/east` `/west` `/kindroid` `/wings` — the three rooms (`/kyros` = East)
+- `/east` `/west` `/kroom` `/wings` — the three browser rooms (`/kyros` = East). `/kindroid` is the 10 Kindroid AIs, not the room.
+- `/kin` or `/kindroid <msg>` — all Kindroid DMs. `/all` is Nomi + Kindroid. `/who` lists who actually has ids loaded.
 - `/status <text>` — remade SUF. They see `[SIT: …]` on the next turns. They can change it with `!status …`. Survives restart (`situation.json`).
 
 ### `!` language they can say

@@ -15,7 +15,11 @@ app.use(express.json());
 
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN2 || '0:selftest-placeholder');
 const NOMI_API_KEY = process.env.NOMI_API_KEY;
-const KINDROID_API_KEY = process.env.KINDROID_API_KEY;
+function trimId(v) {
+    return String(v || '').trim().replace(/^['"]|['"]$/g, '');
+}
+
+const KINDROID_API_KEY = trimId(process.env.KINDROID_API_KEY);
 const wingQueues = { east: [], west: [], kindroid: [] };
 
 // Next to this file — never C:\users\edgia (that EPERM'd on the live box).
@@ -70,7 +74,11 @@ for (const [envKey, value] of Object.entries(process.env)) {
         continue;
     }
     const name = m[1].charAt(0) + m[1].slice(1).toLowerCase();
-    personas[key] = { name, provider: 'kindroid', uuid: value, isThinking: false, queue: [], timeout: null };
+    personas[key] = { name, provider: 'kindroid', uuid: trimId(value), isThinking: false, queue: [], timeout: null };
+}
+
+for (const p of Object.values(personas)) {
+    if (p.uuid) p.uuid = trimId(p.uuid);
 }
 
 let memoryInjections = {};
@@ -249,6 +257,37 @@ function postWings(text) {
     return ['east', 'west', 'kindroid'].map((n) => queueWing(n, text));
 }
 
+function uniquePersonaKeys(filterFn) {
+    const seen = new Set();
+    const keys = [];
+    for (const key of Object.keys(personas)) {
+        const p = personas[key];
+        if (!p.uuid) continue;
+        if (filterFn && !filterFn(p, key)) continue;
+        if (seen.has(p.uuid)) continue;
+        seen.add(p.uuid);
+        keys.push(key);
+    }
+    return keys;
+}
+
+function queueBroadcast(keys, line, ctx, chatId) {
+    keys.forEach((key, i) => {
+        personas[key].queue.push(line);
+        scheduleProcessQueue(key, ctx, chatId, CHUNK_DEBOUNCE_MS + i * 2500);
+    });
+}
+
+function kindroidReply(data) {
+    if (data == null) return '';
+    if (typeof data === 'string') return data;
+    if (Buffer.isBuffer(data)) return data.toString('utf8');
+    if (typeof data === 'object') {
+        return data.message || data.text || data.reply || data.content || '';
+    }
+    return String(data);
+}
+
 function scheduleProcessQueue(personaKey, ctx, customChatId, delay = CHUNK_DEBOUNCE_MS) {
     const nomi = personas[personaKey];
     if (!nomi) return;
@@ -335,6 +374,13 @@ async function sendToNomi(personaKey, compiledText, ctx, customChatId = null) {
     const nomi = personas[personaKey];
     if (!nomi || !nomi.uuid) {
         console.error(`[Router Error] Missing profile: ${personaKey}`);
+        if (ctx && ctx.reply) {
+            await ctx.reply(`⚠️ ${nomi?.name || personaKey} has no AI id in .env — not sent.`);
+        }
+        return;
+    }
+    if (nomi.provider === 'kindroid' && !KINDROID_API_KEY) {
+        if (ctx && ctx.reply) await ctx.reply('⚠️ KINDROID_API_KEY missing. Kindroid DMs will not send.');
         return;
     }
     nomi.isThinking = true;
@@ -363,12 +409,16 @@ async function sendToNomi(personaKey, compiledText, ctx, customChatId = null) {
         if (nomi.provider === 'kindroid') {
             response = await axios.post(
                 'https://api.kindroid.ai/v1/send-message',
-                { ai_id: nomi.uuid, message: basePayload },
+                { ai_id: nomi.uuid, message: basePayload, stream: false },
                 {
                     headers: {
-                        Authorization: `Bearer ${(KINDROID_API_KEY || '').trim()}`,
-                        'Content-Type': 'application/json'
-                    }
+                        Authorization: `Bearer ${KINDROID_API_KEY}`,
+                        'Content-Type': 'application/json',
+                        Accept: 'text/plain, application/json'
+                    },
+                    responseType: 'text',
+                    transformResponse: [(d) => d],
+                    timeout: 180000
                 }
             );
         } else {
@@ -380,11 +430,22 @@ async function sendToNomi(personaKey, compiledText, ctx, customChatId = null) {
         }
 
         let replyText = nomi.provider === 'kindroid'
-            ? (response.data.message || response.data.text || response.data.reply || response.data)
-            : response.data.replyMessage?.text;
+            ? kindroidReply(response.data)
+            : response.data?.replyMessage?.text;
 
-        if (typeof replyText === 'string') replyText = spokenOnly(replyText);
-        if (!replyText) return;
+        if (typeof replyText === 'string') {
+            try {
+                const parsed = JSON.parse(replyText);
+                const nested = kindroidReply(parsed);
+                if (nested) replyText = nested;
+            } catch { /* plain text */ }
+            replyText = spokenOnly(replyText);
+        }
+        if (!replyText) {
+            console.warn(`empty reply from ${nomi.name} (${nomi.provider})`);
+            if (ctx && ctx.reply) await ctx.reply(`⚠️ ${nomi.name} returned an empty reply.`);
+            return;
+        }
 
         const displayOutput = `🤖 [${nomi.name.toUpperCase()}]: ${replyText}`;
         const targetChatId = customChatId || ctx?.chat?.id || process.env.TELEGRAM_ECHO_KYROS_CHAT_ID;
@@ -409,8 +470,13 @@ async function sendToNomi(personaKey, compiledText, ctx, customChatId = null) {
             scheduleProcessQueue(actualTarget, ctx, customChatId, 3500);
         }
     } catch (error) {
-        console.error(`❌ ${nomi.name}:`, error.response ? error.response.data : error.message);
-        if (ctx && ctx.reply) await ctx.reply(`[System Error: ${nomi.name}'s connection line failed]`);
+        const detail = error.response
+            ? `HTTP ${error.response.status} ${String(error.response.data).slice(0, 180)}`
+            : error.message;
+        console.error(`❌ ${nomi.name}:`, detail);
+        if (ctx && ctx.reply) {
+            await ctx.reply(`[System Error: ${nomi.name} ${nomi.provider} failed — ${detail}]`);
+        }
     } finally {
         nomi.isThinking = false;
         if (nomi.queue.length > 0) scheduleProcessQueue(personaKey, ctx, customChatId, 1000);
@@ -432,11 +498,22 @@ bot.on('text', async (ctx) => {
     if (!rawText.startsWith('/')) return;
 
     const parts = rawText.split(' ');
-    const command = parts[0].toLowerCase().substring(1);
+    const command = parts[0].toLowerCase().substring(1).split('@')[0];
     const textPayload = parts.slice(1).join(' ');
     const username = ctx.from.username || ctx.from.first_name || 'James';
 
     if (command === 'status') return;
+    if (command === 'who') {
+        const nomi = uniquePersonaKeys((p) => p.provider === 'nomi').map((k) => personas[k].name);
+        const kin = uniquePersonaKeys((p) => p.provider === 'kindroid').map((k) => personas[k].name);
+        const miss = [...new Set(Object.values(personas).filter((p) => p.provider === 'kindroid' && !p.uuid).map((p) => p.name))];
+        return ctx.reply(
+            `Nomi (${nomi.length}): ${nomi.join(', ') || 'none'}\n` +
+            `Kindroid ready (${kin.length}): ${kin.join(', ') || 'none'}\n` +
+            `Kindroid missing id: ${miss.join(', ') || 'none'}\n` +
+            `KINDROID_API_KEY: ${KINDROID_API_KEY ? 'set' : 'MISSING'}`
+        );
+    }
     if (!textPayload) return ctx.reply(`⚠ /${command} [your text]`);
 
     if (command === 'wings') {
@@ -445,23 +522,28 @@ bot.on('text', async (ctx) => {
         return;
     }
 
-    if (command === 'east' || command === 'west' || command === 'kindroid' || command === 'kyros') {
-        const house = command === 'kyros' ? 'east' : command;
+    if (command === 'east' || command === 'west' || command === 'kroom' || command === 'kyros') {
+        const house = command === 'kyros' ? 'east' : command === 'kroom' ? 'kindroid' : command;
         const where = postHouse(house, `${username}: ${textPayload}`);
         await ctx.reply(`✅ Queued for ${where}.`);
         return;
     }
 
-    if (command === 'all') {
-        ctx.reply('📢 Broadcasting…');
-        const seen = new Set();
-        for (const key of Object.keys(personas)) {
-            const uuid = personas[key].uuid;
-            if (!uuid || seen.has(uuid)) continue;
-            seen.add(uuid);
-            personas[key].queue.push(`${username} (To All): ${textPayload}`);
-            scheduleProcessQueue(key, ctx, ctx.message.chat.id);
+    if (command === 'all' || command === 'kin' || command === 'kindroid' || command === 'kindroids') {
+        const filter = (command === 'all')
+            ? null
+            : (p) => p.provider === 'kindroid';
+        const keys = uniquePersonaKeys(filter);
+        if (!keys.length) {
+            return ctx.reply(command === 'all'
+                ? '⚠️ Nobody has an id in .env.'
+                : '⚠️ No Kindroid AI ids loaded. Check KINDROID_AI_ID_* and restart index2. /who');
         }
+        const line = `${username} (${command === 'all' ? 'To All' : 'To Kindroid'}): ${textPayload}`;
+        queueBroadcast(keys, line, ctx, ctx.message.chat.id);
+        const kin = keys.filter((k) => personas[k].provider === 'kindroid').length;
+        const nomi = keys.length - kin;
+        await ctx.reply(`📢 Queued ${keys.length}: ${nomi} Nomi, ${kin} Kindroid. Staggered so Kindroid is not rate-limited.`);
         return;
     }
 
@@ -719,6 +801,11 @@ if (isMain()) {
     }
 
     startHttp(preferred, !process.env.KYROS_PORT);
+    const kinReady = uniquePersonaKeys((p) => p.provider === 'kindroid').map((k) => personas[k].name);
+    const kinMiss = [...new Set(Object.values(personas).filter((p) => p.provider === 'kindroid' && !p.uuid).map((p) => p.name))];
+    console.log('Kindroid API key: ' + (KINDROID_API_KEY ? 'set' : 'MISSING'));
+    console.log('Kindroid ready: ' + (kinReady.join(', ') || '(none)'));
+    console.log('Kindroid missing id: ' + (kinMiss.join(', ') || '(none)'));
     bot.launch().then(() => console.log('🚀 Kyros router online — inclinations stripped, hive spoken-only'));
 }
 
