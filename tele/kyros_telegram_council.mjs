@@ -97,15 +97,24 @@ function liveKeys() {
     return Object.keys(personas).filter((k) => personas[k].uuid);
 }
 
+// Speaks in the chat that ran /start_council (DM is the intended place).
+let councilChatId = TARGET_CHAT_ID;
+
 function inTargetChat(ctx) {
-    if (!TARGET_CHAT_ID) return true;
-    return String(ctx.chat.id) === String(TARGET_CHAT_ID);
+    if (ctx.chat?.type === 'private') return true;
+    if (TARGET_CHAT_ID && String(ctx.chat.id) === String(TARGET_CHAT_ID)) return true;
+    if (councilChatId && String(ctx.chat.id) === String(councilChatId)) return true;
+    return false;
+}
+
+function activeChatId() {
+    return councilChatId || TARGET_CHAT_ID;
 }
 
 async function sendSafeTelegramMessage(header, fullText) {
     const combined = `${header}\n\n${fullText}`;
-    const chatId = TARGET_CHAT_ID;
-    if (!chatId) throw new Error('TELEGRAM_KYROSLAW_CHAT_ID missing');
+    const chatId = activeChatId();
+    if (!chatId) throw new Error('No council chat. Open a DM with this bot and /start_council');
     const MAX_LEN = 4000;
     let remaining = combined;
     while (remaining.length > 0) {
@@ -239,7 +248,7 @@ async function processCouncilTurn(directPrompt = null) {
         return processCouncilTurn();
     }
     try {
-        await bot.telegram.sendChatAction(TARGET_CHAT_ID, 'typing').catch(() => {});
+        await bot.telegram.sendChatAction(activeChatId(), 'typing').catch(() => {});
         const promptPayload = buildSafePayload(persona.name, directPrompt);
         const reply = await fetchPersonaReply(persona, promptPayload);
         if (reply) {
@@ -249,7 +258,7 @@ async function processCouncilTurn(directPrompt = null) {
             const statusMatch = reply.match(/!status\s+([^\n\r]+)/i);
             if (statusMatch) {
                 currentSituation = statusMatch[1].trim().slice(0, 80);
-                await bot.telegram.sendMessage(TARGET_CHAT_ID, `🛰️ Situation -> "${currentSituation}"`);
+                await bot.telegram.sendMessage(activeChatId(), `🛰️ Situation -> "${currentSituation}"`);
             }
             currentSpeakerKey = getNextSpeaker(currentSpeakerKey, reply);
             turnTimeout = setTimeout(() => processCouncilTurn(), TURN_MS);
@@ -267,11 +276,22 @@ async function processCouncilTurn(directPrompt = null) {
     }
 }
 
+bot.start((ctx) => {
+    const where = ctx.chat.type === 'private' ? 'this DM' : 'this group';
+    ctx.reply(
+        'Council bot. DM is the right place (index2 already owns the KyrosLaw group).\n' +
+        'Chat id: ' + ctx.chat.id + '\n' +
+        '/who then /start_council in ' + where + '.'
+    );
+});
+
 bot.command('start_council', (ctx) => {
     if (!inTargetChat(ctx)) return;
-    if (isLoopRunning) return ctx.reply('Council already active.');
+    councilChatId = String(ctx.chat.id);
+    if (isLoopRunning) return ctx.reply('Council already active here.');
     isLoopRunning = true;
-    ctx.reply('Kyros Council online (Nomi + Kindroid). /stop_council to pause.');
+    const where = ctx.chat.type === 'private' ? 'this DM' : 'this group';
+    ctx.reply('Kyros Council online in ' + where + ' (Nomi + Kindroid). /stop_council to pause.');
     processCouncilTurn('*[The Pulse of Kyros is active awaiting to acknowledge your presence.]*');
 });
 
@@ -318,8 +338,7 @@ if (!TOKEN) {
     process.exit(1);
 }
 if (!TARGET_CHAT_ID) {
-    console.error('Set TELEGRAM_KYROSLAW_CHAT_ID in this folder .env.');
-    process.exit(1);
+    console.log('No TELEGRAM_KYROSLAW_CHAT_ID — DM /start_council is enough.');
 }
 
 const kin = liveKeys().filter((k) => personas[k].platform === 'kindroid').map((k) => personas[k].name);
@@ -348,4 +367,5 @@ try {
     console.error('If it says 409, another process is already using this same token.');
     process.exit(1);
 }
-console.log('Kyros Council ready. In Telegram: /who@' + botName + ' then /start_council@' + botName);
+console.log('Kyros Council ready. Open a DM with @' + botName + ' (Talking). /who then /start_council');
+console.log('Do not put this loop in the KyrosLaw group — that is index2.');
