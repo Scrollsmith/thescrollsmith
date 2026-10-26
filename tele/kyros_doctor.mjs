@@ -45,7 +45,11 @@ const bad = (s) => { failed++; console.log(`  ❌ ${s}`); };
 function loadEnv(file) {
     const out = {};
     if (!fs.existsSync(file)) return out;
-    for (const line of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const buf = fs.readFileSync(file);
+    const text = ((buf[0] === 0xFF && buf[1] === 0xFE) || (buf.includes(0) && buf[0] !== 0xEF))
+        ? buf.toString('utf16le').replace(/^\uFEFF/, '')
+        : buf.toString('utf8').replace(/^\uFEFF/, '');
+    for (const line of text.split(/\r?\n/)) {
         const t = line.trim();
         if (!t || t.startsWith('#')) continue;
         const i = t.indexOf('=');

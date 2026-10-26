@@ -9,10 +9,42 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(HERE, '.env') });
+
+function readEnvFileText(envPath) {
+    const buf = fs.readFileSync(envPath);
+    if ((buf[0] === 0xFF && buf[1] === 0xFE) || (buf.includes(0) && buf[0] !== 0xEF)) {
+        return { text: buf.toString('utf16le').replace(/^\uFEFF/, ''), encoding: 'utf16le' };
+    }
+    return { text: buf.toString('utf8').replace(/^\uFEFF/, ''), encoding: 'utf8' };
+}
+
+function loadLocalEnv() {
+    const envPath = path.join(HERE, '.env');
+    dotenv.config({ path: envPath });
+    if (!fs.existsSync(envPath)) return { envPath, exists: false, encoding: 'missing' };
+    const { text, encoding } = readEnvFileText(envPath);
+    for (const raw of text.split(/\r?\n/)) {
+        const line = raw.replace(/^\uFEFF/, '').trim();
+        if (!line || line.startsWith('#')) continue;
+        const i = line.indexOf('=');
+        if (i < 1) continue;
+        const k = line.slice(0, i).trim().replace(/^export\s+/i, '');
+        const v = line.slice(i + 1).trim().replace(/^['"]|['"]$/g, '');
+        if (k) process.env[k] = v;
+    }
+    return { envPath, exists: true, encoding };
+}
+
+const envInfo = loadLocalEnv();
 
 function trimId(v) {
     return String(v || '').trim().replace(/^['"]|['"]$/g, '');
+}
+
+function presentTelegramKeys() {
+    return Object.keys(process.env)
+        .filter((k) => /^(TELEGRAM_|KYROS_COUNCIL_TOKEN)/i.test(k) && trimId(process.env[k]))
+        .sort();
 }
 
 const TOKEN = trimId(process.env.KYROS_COUNCIL_TOKEN || process.env.TELEGRAM_TOKENX);
@@ -276,12 +308,17 @@ bot.on('text', (ctx) => {
     processCouncilTurn(username + ': ' + text);
 });
 
+console.log('folder: ' + HERE);
+console.log('env: ' + envInfo.envPath + ' (' + envInfo.encoding + ')');
+console.log('telegram keys present: ' + (presentTelegramKeys().join(', ') || '(none)'));
+
 if (!TOKEN) {
     console.error('Set TELEGRAM_TOKENX (or KYROS_COUNCIL_TOKEN). Do not use TOKEN2 — that is index2.');
+    console.error('This .env has: ' + (presentTelegramKeys().join(', ') || '(no TELEGRAM_* keys at all)'));
     process.exit(1);
 }
 if (!TARGET_CHAT_ID) {
-    console.error('Set TELEGRAM_KYROSLAW_CHAT_ID.');
+    console.error('Set TELEGRAM_KYROSLAW_CHAT_ID in this folder .env.');
     process.exit(1);
 }
 

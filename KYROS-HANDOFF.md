@@ -32,7 +32,7 @@ node kyros_doctor.mjs
 
 Looks at `.env` key *names* (not values), whether 8080/`/roster`/`/poll-web-queue` are alive, Telegram `getMe`, and the Nomi list/room. Exit 0 = green. Copy `tele/kyros_doctor.mjs` next to live `index2.mjs`.
 
-`kyros_telegram_council.mjs` is the overnight speaker loop. Copy it next to live `.env` and double-click **`RUN-COUNCIL.cmd`** (or `node kyros_telegram_council.mjs`). It uses **`TELEGRAM_TOKENX`** only so index2 can keep `TOKEN2`. Then in Telegram: `/who` (must list all 10 Kindroids) then `/start_council`. The paste that used `TOKEN2` + `provider: 'kindroid'` will **not** work — Kindroids were sent to the Nomi API. Do **not** run `kyros_web_sandbox.mjs` next to index2 (same TOKEN2). Hub is a second brain you never cut over to.
+`kyros_telegram_council.mjs` is the overnight speaker loop. Copy it next to live `.env` and double-click **`RUN-COUNCIL.cmd`** (or `node kyros_telegram_council.mjs`). It uses **`TELEGRAM_TOKENX`** only so index2 can keep `TOKEN2`. **If the window says Press any key, it already died** — screenshot the lines above that. Success looks like `Kyros Council ready on TOKENX` and the window stays open. Then in Telegram: `/who` (must list all 10 Kindroids) then `/start_council`. The paste that used `TOKEN2` + `provider: 'kindroid'` will **not** work — Kindroids were sent to the Nomi API. Do **not** run `kyros_web_sandbox.mjs` next to index2 (same TOKEN2). Hub is a second brain you never cut over to.
 
 ---
 
