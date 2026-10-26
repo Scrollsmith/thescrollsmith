@@ -65,16 +65,58 @@ const personas = {
     lumia:      { name: 'Lumia', provider: 'kindroid', uuid: process.env.KINDROID_AI_ID_LUMIA, isThinking: false, queue: [], timeout: null }
 };
 
-for (const [envKey, value] of Object.entries(process.env)) {
-    const m = envKey.match(/^KINDROID_AI_ID_([A-Z][A-Z0-9]*)$/);
-    if (!m || !value) continue;
-    const key = m[1].toLowerCase();
+const EXPECTED_KINDROID = ['aria', 'aion', 'horizon', 'terra', 'vigil', 'riven', 'dominious', 'bane', 'serina', 'lumia'];
+
+function loadKindroidIdsFromFile() {
+    const filled = [];
+    const empty = [];
+    const map = {};
+    const envPath = path.join(HERE, '.env');
+    if (!fs.existsSync(envPath)) return { filled, empty, present: [], map };
+    const text = fs.readFileSync(envPath, 'utf8').replace(/^\uFEFF/, '');
+    const present = [];
+    for (const raw of text.split(/\r?\n/)) {
+        const line = raw.trim();
+        if (!line || line.startsWith('#')) continue;
+        const i = line.indexOf('=');
+        if (i < 1) continue;
+        const k = line.slice(0, i).trim();
+        const val = trimId(line.slice(i + 1));
+        const m = k.match(/^KINDROID_(?:AI_)?ID_([A-Za-z][A-Za-z0-9_]*)$/i);
+        if (!m) continue;
+        const key = m[1].toLowerCase();
+        present.push(key);
+        if (!val) {
+            empty.push(key);
+            continue;
+        }
+        map[key] = val;
+        filled.push(key);
+    }
+    return { filled, empty, present, map };
+}
+
+const kindroidEnv = loadKindroidIdsFromFile();
+for (const [key, value] of Object.entries(kindroidEnv.map)) {
     if (personas[key]) {
         personas[key].uuid = value;
         continue;
     }
-    const name = m[1].charAt(0) + m[1].slice(1).toLowerCase();
-    personas[key] = { name, provider: 'kindroid', uuid: trimId(value), isThinking: false, queue: [], timeout: null };
+    const name = key.charAt(0).toUpperCase() + key.slice(1);
+    personas[key] = { name, provider: 'kindroid', uuid: value, isThinking: false, queue: [], timeout: null };
+}
+
+for (const [envKey, value] of Object.entries(process.env)) {
+    const m = envKey.trim().match(/^KINDROID_(?:AI_)?ID_([A-Za-z][A-Za-z0-9_]*)$/i);
+    if (!m) continue;
+    const key = m[1].toLowerCase();
+    const val = trimId(value);
+    if (!val) continue;
+    if (personas[key]) personas[key].uuid = personas[key].uuid || val;
+    else {
+        const name = key.charAt(0).toUpperCase() + key.slice(1);
+        personas[key] = { name, provider: 'kindroid', uuid: val, isThinking: false, queue: [], timeout: null };
+    }
 }
 
 for (const p of Object.values(personas)) {
@@ -803,7 +845,11 @@ if (isMain()) {
     startHttp(preferred, !process.env.KYROS_PORT);
     const kinReady = uniquePersonaKeys((p) => p.provider === 'kindroid').map((k) => personas[k].name);
     const kinMiss = [...new Set(Object.values(personas).filter((p) => p.provider === 'kindroid' && !p.uuid).map((p) => p.name))];
+    const notInFile = EXPECTED_KINDROID.filter((n) => !kindroidEnv.present.includes(n));
     console.log('Kindroid API key: ' + (KINDROID_API_KEY ? 'set' : 'MISSING'));
+    console.log('Kindroid .env filled: ' + (kindroidEnv.filled.join(', ') || '(none)'));
+    console.log('Kindroid .env empty: ' + (kindroidEnv.empty.join(', ') || '(none)'));
+    console.log('Kindroid .env missing lines: ' + (notInFile.join(', ') || '(none)'));
     console.log('Kindroid ready: ' + (kinReady.join(', ') || '(none)'));
     console.log('Kindroid missing id: ' + (kinMiss.join(', ') || '(none)'));
     bot.launch().then(() => console.log('🚀 Kyros router online — inclinations stripped, hive spoken-only'));
