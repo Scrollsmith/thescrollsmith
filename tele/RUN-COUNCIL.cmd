@@ -1,77 +1,26 @@
 @echo off
 cd /d "%~dp0"
 echo.
-echo  ========================================
-echo  Kyros council starter
 echo  folder: %cd%
-echo  ========================================
 echo.
 
 if not exist ".env" (
-  echo  MISSING .env in this folder.
-  echo  Copy RUN-COUNCIL.cmd into C:\users\user\tele next to the live .env.
-  goto FAIL
-)
-
-if exist "kyros_telegram_council.mjs.txt" (
-  echo  The council file was saved as .txt. Rename it to kyros_telegram_council.mjs
-  goto FAIL
+  echo  MISSING .env in this folder. Put this cmd in C:\users\user\tele
+  pause
+  exit /b 1
 )
 
 if not exist "kyros_telegram_council.mjs" (
-  echo  MISSING kyros_telegram_council.mjs in this folder.
-  echo  Download RAW, not the GitHub webpage:
-  echo  https://raw.githubusercontent.com/Scrollsmith/thescrollsmith/cursor/kyros-doctor-b7f6/tele/kyros_telegram_council.mjs
-  goto FAIL
-)
-
-where node >nul 2>&1
-if errorlevel 1 (
-  echo  NODE is not on PATH in this window.
-  echo  Open the same kind of window you use for index2, then:
-  echo    cd /d "%cd%"
+  echo  MISSING kyros_telegram_council.mjs
+  echo  In PowerShell in this folder you can skip the cmd:
   echo    node kyros_telegram_council.mjs
-  goto FAIL
+  pause
+  exit /b 1
 )
 
-echo  node version:
-call node -v
-if errorlevel 1 goto FAIL
-echo.
-
-if not exist "node_modules\telegraf" (
-  echo  node_modules\telegraf missing. Run START-LIVE.cmd once, or:
-  echo    npm install
-  goto FAIL
-)
-
-echo  checking file...
-call node --check kyros_telegram_council.mjs
-if errorlevel 1 (
-  echo.
-  echo  node --check failed. The syntax error is above.
-  echo  Re-download RAW, not the GitHub webpage:
-  echo  https://raw.githubusercontent.com/Scrollsmith/thescrollsmith/cursor/kyros-doctor-b7f6/tele/kyros_telegram_council.mjs
-  echo  Save as kyros_telegram_council.mjs  (not .txt)
-  goto FAIL
-)
-echo  syntax ok
-echo.
 echo  Opening a window titled: Kyros council TOKENX
-echo  That window stays open even if the council dies.
-echo  index2 can stay running.
+echo  Look at the taskbar if you do not see it.
+echo  Leave THAT window open. This one can close.
 echo.
-
 start "Kyros council TOKENX" cmd /k "node kyros_telegram_council.mjs"
-echo  Look for the new black window. This starter can close.
 pause
-exit /b 0
-
-:FAIL
-echo.
-echo  **********************************************
-echo  START FAILED. Read the lines above. Do not close yet.
-echo  **********************************************
-echo.
-pause
-exit /b 1

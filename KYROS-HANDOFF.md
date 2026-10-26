@@ -32,7 +32,7 @@ node kyros_doctor.mjs
 
 Looks at `.env` key *names* (not values), whether 8080/`/roster`/`/poll-web-queue` are alive, Telegram `getMe`, and the Nomi list/room. Exit 0 = green. Copy `tele/kyros_doctor.mjs` next to live `index2.mjs`.
 
-`kyros_telegram_council.mjs` is the overnight speaker loop. Easiest: in the PowerShell/CMD that already runs index2, `cd C:\users\user\tele` then `node kyros_telegram_council.mjs`. Or double-click **`RUN-COUNCIL.cmd`** (opens a `cmd /k` window titled Kyros council TOKENX). It uses **`TELEGRAM_TOKENX`** only so index2 can keep `TOKEN2`. Success looks like `Kyros Council ready on TOKENX`. Then in Telegram: `/who` (must list all 10 Kindroids) then `/start_council`. The paste that used `TOKEN2` + `provider: 'kindroid'` will **not** work — Kindroids were sent to the Nomi API. Do **not** run `kyros_web_sandbox.mjs` next to index2 (same TOKEN2). Hub is a second brain you never cut over to.
+`kyros_telegram_council.mjs` is the overnight speaker loop. Prefer PowerShell in `C:\users\user\tele`: `node kyros_telegram_council.mjs`. `RUN-COUNCIL.cmd` only opens a `cmd /k` window titled Kyros council TOKENX (no --check, leftover `.txt` is ignored). It uses **`TELEGRAM_TOKENX`** only so index2 can keep `TOKEN2`. Success looks like `Kyros Council ready on TOKENX`. Then in Telegram: `/who` (must list all 10 Kindroids) then `/start_council`. The paste that used `TOKEN2` + `provider: 'kindroid'` will **not** work — Kindroids were sent to the Nomi API. Do **not** run `kyros_web_sandbox.mjs` next to index2 (same TOKEN2). Hub is a second brain you never cut over to.
 
 ---
 
