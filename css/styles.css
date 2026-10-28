@@ -1033,3 +1033,220 @@ audio {
     inset: 120px 0 auto;
   }
 }
+
+/* --- Terminal homepage --- */
+
+.terminal-home {
+  background: #000;
+  color: #33ff66;
+  font-family: "Courier New", Courier, "Lucida Console", monospace;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.terminal-home,
+.terminal-home * {
+  box-sizing: border-box;
+}
+
+.terminal-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 2rem 1.25rem 3rem;
+  text-align: center;
+}
+
+.terminal-boot {
+  display: grid;
+  gap: 0.35rem;
+  font-size: clamp(0.85rem, 2.4vw, 1rem);
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+.terminal-line {
+  margin: 0;
+}
+
+.terminal-gates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 1.75rem;
+}
+
+.terminal-gate {
+  color: #33ff66;
+  font-size: clamp(1.05rem, 3.2vw, 1.45rem);
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.35rem;
+  border: 1px solid transparent;
+  outline: none;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.terminal-gate:hover,
+.terminal-gate:focus-visible {
+  color: #9dffb8;
+  border-color: rgba(51, 255, 102, 0.55);
+  background: rgba(51, 255, 102, 0.06);
+}
+
+.terminal-gate:focus-visible {
+  outline: 2px solid #33ff66;
+  outline-offset: 4px;
+}
+
+.terminal-signature {
+  margin: 0;
+  font-size: clamp(0.8rem, 2vw, 0.95rem);
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .terminal-boot .terminal-line {
+    opacity: 0;
+    animation: terminal-boot-in 480ms ease forwards;
+  }
+
+  .terminal-boot .terminal-line:nth-child(1) {
+    animation-delay: 80ms;
+  }
+
+  .terminal-boot .terminal-line:nth-child(2) {
+    animation-delay: 280ms;
+  }
+
+  .terminal-boot .terminal-line:nth-child(3) {
+    animation-delay: 480ms;
+  }
+
+  .terminal-gates {
+    opacity: 0;
+    animation: terminal-boot-in 520ms ease 620ms forwards;
+  }
+
+  .terminal-signature {
+    opacity: 0;
+    animation: terminal-signature-in 520ms ease 820ms forwards;
+  }
+}
+
+@keyframes terminal-boot-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 0.85;
+    transform: translateY(0);
+  }
+}
+
+@keyframes terminal-signature-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-boot .terminal-line,
+  .terminal-gates,
+  .terminal-signature {
+    opacity: 0.85;
+    animation: none;
+  }
+
+  .terminal-signature {
+    opacity: 0.7;
+  }
+}
+
+/* --- Interior reshape helpers --- */
+
+.slot-empty {
+  color: var(--muted);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  margin: 0.6rem 0;
+}
+
+.gate-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.85rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(108, 242, 255, 0.14);
+}
+
+.gate-subnav a {
+  color: var(--muted);
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.1rem;
+}
+
+.gate-subnav a:hover,
+.gate-subnav a:focus-visible,
+.gate-subnav a[aria-current="page"] {
+  color: var(--accent);
+}
+
+.release-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 1.1rem 0 1.4rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid rgba(108, 242, 255, 0.14);
+  border-bottom: 1px solid rgba(108, 242, 255, 0.14);
+}
+
+.release-subnav a {
+  color: var(--muted);
+  font-size: 0.92rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.release-subnav a:hover,
+.release-subnav a:focus-visible,
+.release-subnav a[aria-current="page"] {
+  color: var(--text);
+}
+
+.release-overview-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.release-aside {
+  align-self: start;
+}
+
+.current-release-hero h1 {
+  font-size: clamp(1.7rem, 4.5vw, 2.8rem);
+}
+
+.release-track-list {
+  list-style: decimal;
+  padding-left: 1.4rem;
+}
+
+@media (max-width: 900px) {
+  .release-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}

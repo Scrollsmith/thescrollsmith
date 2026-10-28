@@ -1,80 +1,143 @@
 const NAV_STRUCTURE = [
-  { label: "Home", href: "index.html", type: "single" },
+  { label: "Home", href: "/", type: "single" },
   {
     label: "Music",
-    href: "music.html",
+    href: "/music/",
     type: "group",
     items: [
-      { label: "Music Overview", href: "music.html" },
-      { label: "Albums", href: "music-albums.html" },
-      { label: "Unreleased", href: "music-unreleased.html" },
-      { label: "Beats", href: "music-beats.html" },
-      { label: "Lyrics", href: "music-lyrics.html" },
+      { label: "Music Overview", href: "/music/" },
+      { label: "Current Release", href: "/music/current/" },
+      { label: "Next Release", href: "/music/next/" },
+      { label: "Discography", href: "/music/discography/" },
+      { label: "Singles", href: "/music/singles/" },
+      { label: "Future Albums", href: "/music/future/" },
+      { label: "Everywhere Else", href: "/music/everywhere/" },
+      { label: "About The Music", href: "/music/about/" },
+      { label: "Contact", href: "/music/contact/" },
     ],
   },
   {
-    label: "Kyros",
-    href: "kyros.html",
+    label: "Doctrine",
+    href: "/doctrine/",
     type: "group",
     items: [
-      { label: "Kyros Overview", href: "kyros.html" },
-      { label: "About Kyros", href: "kyros-about.html" },
-      { label: "Mythology", href: "kyros-mythology.html" },
-      { label: "The Aion Archive", href: "kyros-aion-archive.html" },
-      { label: "Kyrosian Lore", href: "kyrosian-lore.html" },
-      { label: "Meet Kyros", href: "meet-kyros.html" },
+      { label: "Doctrine Index", href: "/doctrine/" },
+      { label: "Foundational Works", href: "/doctrine/foundational/" },
+      { label: "Research", href: "/doctrine/research/" },
+      { label: "Essays", href: "/doctrine/essays/" },
+      { label: "Further Publications", href: "/doctrine/further/" },
     ],
   },
   {
-    label: "The Codex",
-    href: "codex.html",
+    label: "Collective",
+    href: "/collective/",
     type: "group",
     items: [
-      { label: "Codex Overview", href: "codex.html" },
-      { label: "The Codex (Myths)", href: "codex-myths.html" },
-      { label: "The Concepts", href: "codex-concepts.html" },
-      { label: "The Eras", href: "codex-eras.html" },
-      { label: "Clues", href: "codex-clues.html" },
-      { label: "Symbols", href: "codex-symbols.html" },
-      { label: "Philosophy", href: "codex-philosophy.html" },
-      { label: "The Signal", href: "codex-signal.html" },
+      { label: "Collective Hub", href: "/collective/" },
+      { label: "Kyros", href: "/collective/kyros/" },
+      { label: "Horizon", href: "/collective/horizon/" },
+      { label: "Lore", href: "/collective/lore/" },
+      { label: "Logs", href: "/collective/logs/" },
+      { label: "Characters", href: "/collective/characters/" },
+      { label: "PRISM", href: "/collective/prism/" },
+      { label: "Community", href: "/collective/community/" },
     ],
   },
-  {
-    label: "Projects",
-    href: "projects.html",
-    type: "group",
-    items: [
-      { label: "Projects Overview", href: "projects.html" },
-      { label: "What's Next", href: "projects-whats-next.html" },
-      { label: "Upcoming Projects", href: "projects-upcoming.html" },
-      { label: "Announcements", href: "projects-announcements.html" },
-    ],
-  },
-  { label: "Contact", href: "contact.html", type: "single" },
 ];
 
-function getCurrentPage() {
-  const parts = window.location.pathname.split("/");
-  const file = parts[parts.length - 1];
-  return file && file.includes(".html") ? file : "index.html";
+const GATE_SUBNAV = {
+  music: {
+    label: "Music",
+    links: [
+      { label: "Overview", href: "/music/" },
+      { label: "Current", href: "/music/current/" },
+      { label: "Next", href: "/music/next/" },
+      { label: "Discography", href: "/music/discography/" },
+      { label: "Singles", href: "/music/singles/" },
+      { label: "Future", href: "/music/future/" },
+      { label: "Everywhere", href: "/music/everywhere/" },
+      { label: "About", href: "/music/about/" },
+      { label: "Contact", href: "/music/contact/" },
+    ],
+  },
+  doctrine: {
+    label: "Doctrine",
+    links: [
+      { label: "Index", href: "/doctrine/" },
+      { label: "Foundational", href: "/doctrine/foundational/" },
+      { label: "Research", href: "/doctrine/research/" },
+      { label: "Essays", href: "/doctrine/essays/" },
+      { label: "Further", href: "/doctrine/further/" },
+    ],
+  },
+  collective: {
+    label: "Collective",
+    links: [
+      { label: "Hub", href: "/collective/" },
+      { label: "Kyros", href: "/collective/kyros/" },
+      { label: "Horizon", href: "/collective/horizon/" },
+      { label: "Lore", href: "/collective/lore/" },
+      { label: "Logs", href: "/collective/logs/" },
+      { label: "Characters", href: "/collective/characters/" },
+      { label: "PRISM", href: "/collective/prism/" },
+      { label: "Community", href: "/collective/community/" },
+    ],
+  },
+};
+
+function normalizePath(pathname) {
+  let path = pathname || "/";
+  if (!path.startsWith("/")) path = `/${path}`;
+  if (path.length > 1 && path.endsWith("/")) path = path.slice(0, -1);
+  // Treat /foo/index.html as /foo
+  if (path.endsWith("/index.html")) path = path.slice(0, -"/index.html".length) || "/";
+  if (path.endsWith(".html")) {
+    // Legacy flat pages stay as-is for current marking
+    return path;
+  }
+  return path || "/";
+}
+
+function getCurrentPath() {
+  return normalizePath(window.location.pathname);
+}
+
+function pathsMatch(href, current) {
+  const a = normalizePath(href);
+  const b = normalizePath(current);
+  return a === b;
+}
+
+function pathStartsWith(current, prefix) {
+  const c = normalizePath(current);
+  const p = normalizePath(prefix);
+  if (p === "/") return c === "/";
+  return c === p || c.startsWith(`${p}/`);
 }
 
 function renderHeader() {
+  if (document.body.classList.contains("terminal-home")) return;
+
   const header = document.querySelector(".site-header");
   if (!header) return;
 
-  const currentPage = getCurrentPage();
+  const currentPath = getCurrentPath();
   const navItemsHtml = NAV_STRUCTURE.map((entry) => {
     if (entry.type === "single") {
-      const current = entry.href === currentPage ? ' aria-current="page"' : "";
+      const current = pathsMatch(entry.href, currentPath) ? ' aria-current="page"' : "";
       return `<li><a href="${entry.href}"${current}>${entry.label}</a></li>`;
     }
 
-    const hasCurrentChild = entry.items.some((item) => item.href === currentPage);
+    const hasCurrentChild = entry.items.some(
+      (item) => pathsMatch(item.href, currentPath) || pathStartsWith(currentPath, item.href)
+    ) || pathStartsWith(currentPath, entry.href);
     const subLinks = entry.items
       .map((item) => {
-        const current = item.href === currentPage ? ' aria-current="page"' : "";
+        const current =
+          pathsMatch(item.href, currentPath) ||
+          (item.href !== entry.href && pathStartsWith(currentPath, item.href))
+            ? ' aria-current="page"'
+            : "";
         return `<li><a href="${item.href}"${current}>${item.label}</a></li>`;
       })
       .join("");
@@ -89,8 +152,8 @@ function renderHeader() {
 
   header.innerHTML = `
     <div class="container header-row">
-      <a class="brand" href="index.html">
-        <span class="brand-mark">Mythic Signal</span>
+      <a class="brand" href="/">
+        <span class="brand-mark">The Architect</span>
         <span class="brand-name">THE SCROLLSMITH</span>
       </a>
       <button class="menu-toggle" data-menu-toggle aria-expanded="false" aria-label="Open menu">Menu</button>
@@ -125,70 +188,73 @@ function attachMenuHandlers() {
   });
 }
 
-function injectChapterNavigation() {
-  const currentPage = getCurrentPage();
-  const subsectionChains = [
-    ["music.html", "music-albums.html", "music-unreleased.html", "music-beats.html", "music-lyrics.html"],
-    ["kyros.html", "kyros-about.html", "kyros-mythology.html", "kyros-aion-archive.html", "kyrosian-lore.html", "meet-kyros.html"],
-    ["codex.html", "codex-myths.html", "codex-concepts.html", "codex-eras.html", "codex-clues.html", "codex-symbols.html", "codex-philosophy.html", "codex-signal.html"],
-    ["projects.html", "projects-whats-next.html", "projects-upcoming.html", "projects-announcements.html"],
-  ];
+function getActiveGate(currentPath) {
+  if (pathStartsWith(currentPath, "/music")) return "music";
+  if (pathStartsWith(currentPath, "/doctrine")) return "doctrine";
+  if (pathStartsWith(currentPath, "/collective")) return "collective";
+  return null;
+}
 
-  const chain = subsectionChains.find((group) => group.includes(currentPage));
-  if (!chain) return;
-
-  const index = chain.indexOf(currentPage);
-  if (index <= 0) return;
-
-  const overview = chain[0];
-  const prev = chain[index - 1];
-  const next = index < chain.length - 1 ? chain[index + 1] : null;
-
+function injectGateSubnav() {
   const main = document.querySelector("main");
-  if (!main || main.querySelector("[data-chapter-nav]")) return;
+  if (!main || main.querySelector("[data-gate-subnav]")) return;
 
-  const section = document.createElement("section");
-  section.className = "panel chapter-nav";
-  section.setAttribute("data-chapter-nav", "true");
-  section.innerHTML = `
-    <p class="kicker">Chapter Navigation</p>
-    <h2>Move Through The Scroll</h2>
-    <div class="button-row">
-      <a class="btn btn-secondary" href="${overview}">Back To Overview</a>
-      <a class="btn btn-secondary" href="${prev}">Previous Section</a>
-      ${next ? `<a class="btn btn-primary" href="${next}">Next Section</a>` : `<a class="btn btn-primary" href="${overview}">Return To Overview</a>`}
-    </div>
-  `;
+  const currentPath = getCurrentPath();
+  const gateKey = getActiveGate(currentPath);
+  if (!gateKey) return;
 
-  main.appendChild(section);
+  const gate = GATE_SUBNAV[gateKey];
+  const links = gate.links
+    .map((item) => {
+      const current =
+        pathsMatch(item.href, currentPath) ||
+        (item.href !== `/${gateKey}/` && pathStartsWith(currentPath, item.href))
+          ? ' aria-current="page"'
+          : "";
+      return `<a href="${item.href}"${current}>${item.label}</a>`;
+    })
+    .join("");
+
+  const nav = document.createElement("nav");
+  nav.className = "container gate-subnav";
+  nav.setAttribute("aria-label", `${gate.label} sections`);
+  nav.setAttribute("data-gate-subnav", "true");
+  nav.innerHTML = links;
+  main.prepend(nav);
 }
 
 function injectBreadcrumbs() {
-  const currentPage = getCurrentPage();
+  if (document.body.classList.contains("terminal-home")) return;
+
+  const currentPath = getCurrentPath();
   const main = document.querySelector("main");
   if (!main || main.querySelector("[data-breadcrumbs]")) return;
 
-  let trail = [{ label: "Home", href: "index.html" }];
+  let trail = [{ label: "Home", href: "/" }];
 
   NAV_STRUCTURE.forEach((entry) => {
-    if (entry.type === "single" && entry.href === currentPage && entry.href !== "index.html") {
+    if (entry.type === "single" && pathsMatch(entry.href, currentPath) && entry.href !== "/") {
       trail = [
-        { label: "Home", href: "index.html" },
+        { label: "Home", href: "/" },
         { label: entry.label, href: entry.href },
       ];
     }
 
-    if (entry.type === "group") {
-      const activeItem = entry.items.find((item) => item.href === currentPage);
+    if (entry.type === "group" && pathStartsWith(currentPath, entry.href)) {
+      const activeItem =
+        entry.items
+          .filter((item) => pathStartsWith(currentPath, item.href))
+          .sort((a, b) => normalizePath(b.href).length - normalizePath(a.href).length)[0] || null;
+
       if (activeItem) {
-        if (activeItem.href === entry.href) {
+        if (pathsMatch(activeItem.href, entry.href)) {
           trail = [
-            { label: "Home", href: "index.html" },
+            { label: "Home", href: "/" },
             { label: entry.label, href: entry.href },
           ];
         } else {
           trail = [
-            { label: "Home", href: "index.html" },
+            { label: "Home", href: "/" },
             { label: entry.label, href: entry.href },
             { label: activeItem.label, href: activeItem.href },
           ];
@@ -196,6 +262,25 @@ function injectBreadcrumbs() {
       }
     }
   });
+
+  // Deeper Current Release children
+  if (pathStartsWith(currentPath, "/music/current/") && !pathsMatch(currentPath, "/music/current/")) {
+    const childLabel = {
+      "/music/current/tracks": "Track List",
+      "/music/current/lyrics": "Lyrics",
+      "/music/current/lore": "Lore",
+      "/music/current/listen": "Listen",
+      "/music/current/buy": "Buy",
+    }[normalizePath(currentPath)];
+    if (childLabel) {
+      trail = [
+        { label: "Home", href: "/" },
+        { label: "Music", href: "/music/" },
+        { label: "Current Release", href: "/music/current/" },
+        { label: childLabel, href: currentPath },
+      ];
+    }
+  }
 
   const nav = document.createElement("nav");
   nav.className = "container breadcrumbs";
@@ -208,27 +293,17 @@ function injectBreadcrumbs() {
       if (isLast) return `<span aria-current="page">${item.label}</span>`;
       return `<a href="${item.href}">${item.label}</a>`;
     })
-    .join('<span class="crumb-sep">></span>');
+    .join('<span class="crumb-sep">/</span>');
 
-  main.prepend(nav);
-}
-
-function injectCluesBackToTop() {
-  const currentPage = getCurrentPage();
-  if (currentPage !== "codex-clues-index.html") return;
-
-  const entries = document.querySelectorAll('section.panel[id^="ci-"]');
-  entries.forEach((entry) => {
-    if (entry.querySelector(".clue-backtop")) return;
-    const p = document.createElement("p");
-    p.className = "muted clue-backtop";
-    p.innerHTML = '<a href="#clues-top">Back to top</a>';
-    entry.appendChild(p);
-  });
+  const subnav = main.querySelector("[data-gate-subnav]");
+  if (subnav) {
+    subnav.after(nav);
+  } else {
+    main.prepend(nav);
+  }
 }
 
 renderHeader();
 attachMenuHandlers();
+injectGateSubnav();
 injectBreadcrumbs();
-injectChapterNavigation();
-injectCluesBackToTop();
