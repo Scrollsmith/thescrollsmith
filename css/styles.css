@@ -1111,8 +1111,7 @@ audio {
 
 @media (prefers-reduced-motion: no-preference) {
   .terminal-boot .terminal-line {
-    opacity: 0;
-    animation: terminal-boot-in 480ms ease forwards;
+    animation: terminal-boot-in 480ms ease both;
   }
 
   .terminal-boot .terminal-line:nth-child(1) {
@@ -1128,19 +1127,17 @@ audio {
   }
 
   .terminal-gates {
-    opacity: 0;
-    animation: terminal-boot-in 520ms ease 620ms forwards;
+    animation: terminal-boot-in 520ms ease 620ms both;
   }
 
   .terminal-signature {
-    opacity: 0;
-    animation: terminal-signature-in 520ms ease 820ms forwards;
+    animation: terminal-signature-in 520ms ease 820ms both;
   }
 }
 
 @keyframes terminal-boot-in {
   from {
-    opacity: 0;
+    opacity: 0.35;
     transform: translateY(4px);
   }
   to {
@@ -1151,7 +1148,7 @@ audio {
 
 @keyframes terminal-signature-in {
   from {
-    opacity: 0;
+    opacity: 0.35;
   }
   to {
     opacity: 0.7;
@@ -1162,12 +1159,7 @@ audio {
   .terminal-boot .terminal-line,
   .terminal-gates,
   .terminal-signature {
-    opacity: 0.85;
     animation: none;
-  }
-
-  .terminal-signature {
-    opacity: 0.7;
   }
 }
 
