@@ -1254,6 +1254,70 @@ audio {
   }
 }
 
+.doctrine-article {
+  max-width: 72ch;
+}
+
+.doctrine-article .doctrine-byline {
+  margin-top: -0.35rem;
+  margin-bottom: 1.4rem;
+}
+
+.doctrine-article h2 {
+  margin-top: 1.8rem;
+  margin-bottom: 0.7rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+}
+
+.doctrine-article p {
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 0 1rem;
+}
+
+.doctrine-article .lead {
+  color: var(--text);
+}
+
+.doctrine-article ul,
+.doctrine-article ol {
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0 0 1.1rem;
+  padding-left: 1.3rem;
+}
+
+.doctrine-article li + li {
+  margin-top: 0.55rem;
+}
+
+.doctrine-epigraph {
+  margin: 0.6rem 0 1.4rem;
+  padding: 1rem 1.1rem;
+  border-left: 2px solid rgba(108, 242, 255, 0.35);
+  background: rgba(108, 242, 255, 0.05);
+}
+
+.doctrine-epigraph p {
+  margin: 0 0 0.45rem;
+  color: var(--text);
+  font-style: italic;
+}
+
+.doctrine-epigraph p:last-child {
+  margin-bottom: 0;
+}
+
+.doctrine-backlink {
+  margin-top: 1.8rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(108, 242, 255, 0.14);
+}
+
+.doctrine-backlink a {
+  color: var(--accent);
+}
+
 .release-track-list {
   list-style: decimal;
   padding-left: 1.4rem;
