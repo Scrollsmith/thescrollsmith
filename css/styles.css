@@ -1453,6 +1453,12 @@ audio {
   flex: 0 0 auto;
 }
 
+.tier-chart-heading {
+  margin-top: 0.35rem;
+  margin-bottom: 0.65rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+}
+
 .tier-chart-body h2 {
   margin: 0.15rem 0 0.45rem;
   font-size: 1.12rem;
