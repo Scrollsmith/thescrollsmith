@@ -1235,6 +1235,41 @@ audio {
 .release-track-list {
   list-style: decimal;
   padding-left: 1.4rem;
+  color: var(--text);
+}
+
+.release-track-list li + li {
+  margin-top: 0.45rem;
+}
+
+.lore-scroll {
+  max-width: 54ch;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.lore-scroll p {
+  margin: 0 0 1.25rem;
+}
+
+.lore-scroll p:last-child {
+  margin-bottom: 0;
+}
+
+.lore-excerpt {
+  margin: 1.1rem 0 1.4rem;
+  padding: 1rem 0 0;
+  border-top: 1px dashed rgba(156, 168, 208, 0.24);
+}
+
+.lore-excerpt p {
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0 0 0.65rem;
+}
+
+.lore-excerpt a {
+  color: var(--accent);
 }
 
 @media (max-width: 900px) {

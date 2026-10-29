@@ -6,7 +6,7 @@ const NAV_STRUCTURE = [
     type: "group",
     items: [
       { label: "Music Overview", href: "/music/" },
-      { label: "Current Release", href: "/music/current/" },
+      { label: "The Witnessed", href: "/music/current/" },
       { label: "Next Release", href: "/music/next/" },
       { label: "Discography", href: "/music/discography/" },
       { label: "Singles", href: "/music/singles/" },
@@ -50,7 +50,7 @@ const GATE_SUBNAV = {
     label: "Music",
     links: [
       { label: "Overview", href: "/music/" },
-      { label: "Current", href: "/music/current/" },
+      { label: "The Witnessed", href: "/music/current/" },
       { label: "Next", href: "/music/next/" },
       { label: "Discography", href: "/music/discography/" },
       { label: "Singles", href: "/music/singles/" },
@@ -276,7 +276,7 @@ function injectBreadcrumbs() {
       trail = [
         { label: "Home", href: "/" },
         { label: "Music", href: "/music/" },
-        { label: "Current Release", href: "/music/current/" },
+        { label: "The Witnessed", href: "/music/current/" },
         { label: childLabel, href: currentPath },
       ];
     }
