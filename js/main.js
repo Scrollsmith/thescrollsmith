@@ -23,8 +23,8 @@ const NAV_STRUCTURE = [
     items: [
       { label: "Doctrine Index", href: "/doctrine/" },
       { label: "Foundational Works", href: "/doctrine/foundational/" },
-      { label: "Research", href: "/doctrine/research/" },
-      { label: "Essays", href: "/doctrine/essays/" },
+      { label: "Research & Studies", href: "/doctrine/research/" },
+      { label: "Essays & Reflections", href: "/doctrine/essays/" },
       { label: "Further Publications", href: "/doctrine/further/" },
     ],
   },
@@ -65,8 +65,8 @@ const GATE_SUBNAV = {
     links: [
       { label: "Index", href: "/doctrine/" },
       { label: "Foundational", href: "/doctrine/foundational/" },
-      { label: "Research", href: "/doctrine/research/" },
-      { label: "Essays", href: "/doctrine/essays/" },
+      { label: "Research & Studies", href: "/doctrine/research/" },
+      { label: "Essays & Reflections", href: "/doctrine/essays/" },
       { label: "Further", href: "/doctrine/further/" },
     ],
   },
