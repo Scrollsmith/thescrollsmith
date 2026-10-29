@@ -390,6 +390,17 @@ h1 {
   gap: 1rem;
 }
 
+.grid-2 {
+  margin-top: 1.4rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.catalog-grid .panel {
+  margin: 0;
+}
+
 .card-title {
   margin-bottom: 0.3rem;
 }
@@ -1031,5 +1042,559 @@ audio {
 
   .codex-watermark {
     inset: 120px 0 auto;
+  }
+}
+
+/* --- Terminal homepage --- */
+
+.terminal-home {
+  background: #000;
+  color: #33ff66;
+  font-family: "Courier New", Courier, "Lucida Console", monospace;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.terminal-home,
+.terminal-home * {
+  box-sizing: border-box;
+}
+
+.terminal-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 2rem 1.25rem 3rem;
+  text-align: center;
+}
+
+.terminal-boot {
+  display: grid;
+  gap: 0.35rem;
+  font-size: clamp(0.85rem, 2.4vw, 1rem);
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+.terminal-line {
+  margin: 0;
+}
+
+.terminal-gates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 1.75rem;
+}
+
+.terminal-gate {
+  color: #33ff66;
+  font-size: clamp(1.05rem, 3.2vw, 1.45rem);
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.35rem;
+  border: 1px solid transparent;
+  outline: none;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.terminal-gate:hover,
+.terminal-gate:focus-visible {
+  color: #9dffb8;
+  border-color: rgba(51, 255, 102, 0.55);
+  background: rgba(51, 255, 102, 0.06);
+}
+
+.terminal-gate:focus-visible {
+  outline: 2px solid #33ff66;
+  outline-offset: 4px;
+}
+
+.terminal-signature {
+  margin: 0;
+  font-size: clamp(0.8rem, 2vw, 0.95rem);
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .terminal-boot .terminal-line {
+    animation: terminal-boot-in 480ms ease both;
+  }
+
+  .terminal-boot .terminal-line:nth-child(1) {
+    animation-delay: 80ms;
+  }
+
+  .terminal-boot .terminal-line:nth-child(2) {
+    animation-delay: 280ms;
+  }
+
+  .terminal-boot .terminal-line:nth-child(3) {
+    animation-delay: 480ms;
+  }
+
+  .terminal-gates {
+    animation: terminal-boot-in 520ms ease 620ms both;
+  }
+
+  .terminal-signature {
+    animation: terminal-signature-in 520ms ease 820ms both;
+  }
+}
+
+@keyframes terminal-boot-in {
+  from {
+    opacity: 0.35;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 0.85;
+    transform: translateY(0);
+  }
+}
+
+@keyframes terminal-signature-in {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-boot .terminal-line,
+  .terminal-gates,
+  .terminal-signature {
+    animation: none;
+  }
+}
+
+/* --- Interior reshape helpers --- */
+
+.slot-empty {
+  color: var(--muted);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  margin: 0.6rem 0;
+}
+
+.gate-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.85rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(108, 242, 255, 0.14);
+}
+
+.gate-subnav a {
+  color: var(--muted);
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.1rem;
+}
+
+.gate-subnav a:hover,
+.gate-subnav a:focus-visible,
+.gate-subnav a[aria-current="page"] {
+  color: var(--accent);
+}
+
+.release-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 1.1rem 0 1.4rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid rgba(108, 242, 255, 0.14);
+  border-bottom: 1px solid rgba(108, 242, 255, 0.14);
+}
+
+.release-subnav a {
+  color: var(--muted);
+  font-size: 0.92rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.release-subnav a:hover,
+.release-subnav a:focus-visible,
+.release-subnav a[aria-current="page"] {
+  color: var(--text);
+}
+
+.release-overview-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.release-aside {
+  align-self: start;
+}
+
+.current-release-hero h1 {
+  font-size: clamp(1.7rem, 4.5vw, 2.8rem);
+}
+
+.current-release-hero-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 1.4rem;
+  align-items: center;
+}
+
+.release-cover {
+  max-width: 320px;
+  margin-inline: auto;
+}
+
+.catalog-cover-slot {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  aspect-ratio: 1 / 1;
+  border: 1px dashed rgba(108, 242, 255, 0.28);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.catalog-card-cover {
+  max-width: 180px;
+  margin: 0.35rem 0 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .current-release-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .release-cover {
+    max-width: 260px;
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.doctrine-article {
+  max-width: 72ch;
+}
+
+.doctrine-article .doctrine-byline {
+  margin-top: -0.35rem;
+  margin-bottom: 1.4rem;
+}
+
+.doctrine-article h2 {
+  margin-top: 1.8rem;
+  margin-bottom: 0.7rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+}
+
+.doctrine-article p {
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 0 1rem;
+}
+
+.doctrine-article .lead {
+  color: var(--text);
+}
+
+.doctrine-article ul,
+.doctrine-article ol {
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0 0 1.1rem;
+  padding-left: 1.3rem;
+}
+
+.doctrine-article li + li {
+  margin-top: 0.55rem;
+}
+
+.doctrine-epigraph {
+  margin: 0.6rem 0 1.4rem;
+  padding: 1rem 1.1rem;
+  border-left: 2px solid rgba(108, 242, 255, 0.35);
+  background: rgba(108, 242, 255, 0.05);
+}
+
+.doctrine-epigraph p {
+  margin: 0 0 0.45rem;
+  color: var(--text);
+  font-style: italic;
+}
+
+.doctrine-epigraph p:last-child {
+  margin-bottom: 0;
+}
+
+.doctrine-backlink {
+  margin-top: 1.8rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(108, 242, 255, 0.14);
+}
+
+.doctrine-backlink a {
+  color: var(--accent);
+}
+
+.doctrine-affiliation {
+  margin: 0 0 1.4rem;
+}
+
+.doctrine-affiliation p {
+  margin: 0 0 0.2rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.doctrine-affiliation strong {
+  color: var(--text);
+}
+
+.doctrine-article h3 {
+  margin-top: 1.35rem;
+  margin-bottom: 0.55rem;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.doctrine-formula {
+  font-family: "Consolas", "Courier New", monospace;
+  color: var(--accent);
+}
+
+.doctrine-equation {
+  text-align: center;
+  margin: 0.85rem 0 1.1rem !important;
+  color: var(--text) !important;
+  font-size: 1.05rem;
+}
+
+.doctrine-diagram,
+.doctrine-state-engine {
+  margin: 1rem 0 1.35rem;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  border: 1px solid rgba(108, 242, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(8, 10, 17, 0.85);
+  color: var(--muted);
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  white-space: pre;
+}
+
+.doctrine-references {
+  list-style: none;
+  padding-left: 0;
+}
+
+.doctrine-references li {
+  padding-left: 1.1rem;
+  text-indent: -1.1rem;
+}
+
+.doctrine-references em {
+  color: var(--text);
+  font-style: italic;
+}
+
+.doctrine-maxim {
+  color: var(--text) !important;
+  font-style: italic;
+  margin-bottom: 0.95rem !important;
+}
+
+.doctrine-article sup {
+  color: var(--accent);
+  font-size: 0.75em;
+}
+
+.doctrine-footnotes {
+  color: var(--muted);
+  line-height: 1.65;
+  padding-left: 1.35rem;
+}
+
+.doctrine-footnotes li + li {
+  margin-top: 0.65rem;
+}
+
+.doctrine-footnotes strong {
+  color: var(--text);
+}
+
+.tier-chart {
+  list-style: none;
+  margin: 1.4rem 0 1.6rem;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+  counter-reset: none;
+}
+
+.tier-chart-stage {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.95rem;
+  align-items: start;
+  padding: 1rem 1.05rem;
+  border: 1px solid rgba(108, 242, 255, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(16, 21, 33, 0.95), rgba(9, 12, 20, 0.92));
+  position: relative;
+}
+
+.tier-chart-stage + .tier-chart-stage::before {
+  content: "";
+  position: absolute;
+  left: 1.85rem;
+  top: -0.85rem;
+  width: 2px;
+  height: 0.85rem;
+  background: rgba(108, 242, 255, 0.28);
+}
+
+.tier-chart-badge {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(108, 242, 255, 0.4);
+  color: var(--accent);
+  font-family: "Consolas", "Courier New", monospace;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: rgba(108, 242, 255, 0.08);
+  flex: 0 0 auto;
+}
+
+.tier-chart-heading {
+  margin-top: 0.35rem;
+  margin-bottom: 0.65rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+}
+
+.tier-chart-body h2 {
+  margin: 0.15rem 0 0.45rem;
+  font-size: 1.12rem;
+}
+
+.tier-chart-stage-note {
+  color: var(--accent);
+  font-weight: 500;
+  font-size: 0.92em;
+}
+
+.tier-chart-body p {
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .tier-chart-stage {
+    gap: 0.75rem;
+    padding: 0.9rem;
+  }
+
+  .tier-chart-stage + .tier-chart-stage::before {
+    left: 1.55rem;
+  }
+}
+
+.release-track-list {
+  list-style: decimal;
+  padding-left: 1.4rem;
+  color: var(--text);
+}
+
+.release-track-list li + li {
+  margin-top: 0.45rem;
+}
+
+.lore-scroll {
+  max-width: 54ch;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.lore-scroll p {
+  margin: 0 0 1.25rem;
+}
+
+.lore-scroll p:last-child {
+  margin-bottom: 0;
+}
+
+.lore-excerpt {
+  margin: 1.1rem 0 1.4rem;
+  padding: 1rem 0 0;
+  border-top: 1px dashed rgba(156, 168, 208, 0.24);
+}
+
+.lore-excerpt p {
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0 0 0.65rem;
+}
+
+.lore-excerpt a {
+  color: var(--accent);
+}
+
+.lyrics-track-index {
+  margin: 0.85rem 0 1.4rem;
+}
+
+.lyrics-track-index ol {
+  margin: 0;
+  padding-left: 1.3rem;
+  color: var(--muted);
+}
+
+.lyrics-track-index a {
+  color: var(--accent);
+}
+
+.lyrics-entry {
+  margin-top: 1.6rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(108, 242, 255, 0.14);
+}
+
+.lyrics-entry h3 {
+  margin-bottom: 0.85rem;
+}
+
+.lyrics-entry h4 {
+  margin: 1.1rem 0 0.45rem;
+  color: var(--accent);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lyrics-block {
+  margin: 0 0 0.85rem;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 62ch;
+}
+
+@media (max-width: 900px) {
+  .release-overview-grid {
+    grid-template-columns: 1fr;
   }
 }
