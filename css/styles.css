@@ -1272,6 +1272,45 @@ audio {
   color: var(--accent);
 }
 
+.lyrics-track-index {
+  margin: 0.85rem 0 1.4rem;
+}
+
+.lyrics-track-index ol {
+  margin: 0;
+  padding-left: 1.3rem;
+  color: var(--muted);
+}
+
+.lyrics-track-index a {
+  color: var(--accent);
+}
+
+.lyrics-entry {
+  margin-top: 1.6rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(108, 242, 255, 0.14);
+}
+
+.lyrics-entry h3 {
+  margin-bottom: 0.85rem;
+}
+
+.lyrics-entry h4 {
+  margin: 1.1rem 0 0.45rem;
+  color: var(--accent);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lyrics-block {
+  margin: 0 0 0.85rem;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 62ch;
+}
+
 @media (max-width: 900px) {
   .release-overview-grid {
     grid-template-columns: 1fr;
