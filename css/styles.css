@@ -1406,6 +1406,79 @@ audio {
   color: var(--text);
 }
 
+.tier-chart {
+  list-style: none;
+  margin: 1.4rem 0 1.6rem;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+  counter-reset: none;
+}
+
+.tier-chart-stage {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.95rem;
+  align-items: start;
+  padding: 1rem 1.05rem;
+  border: 1px solid rgba(108, 242, 255, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(16, 21, 33, 0.95), rgba(9, 12, 20, 0.92));
+  position: relative;
+}
+
+.tier-chart-stage + .tier-chart-stage::before {
+  content: "";
+  position: absolute;
+  left: 1.85rem;
+  top: -0.85rem;
+  width: 2px;
+  height: 0.85rem;
+  background: rgba(108, 242, 255, 0.28);
+}
+
+.tier-chart-badge {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(108, 242, 255, 0.4);
+  color: var(--accent);
+  font-family: "Consolas", "Courier New", monospace;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: rgba(108, 242, 255, 0.08);
+  flex: 0 0 auto;
+}
+
+.tier-chart-body h2 {
+  margin: 0.15rem 0 0.45rem;
+  font-size: 1.12rem;
+}
+
+.tier-chart-stage-note {
+  color: var(--accent);
+  font-weight: 500;
+  font-size: 0.92em;
+}
+
+.tier-chart-body p {
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .tier-chart-stage {
+    gap: 0.75rem;
+    padding: 0.9rem;
+  }
+
+  .tier-chart-stage + .tier-chart-stage::before {
+    left: 1.55rem;
+  }
+}
+
 .release-track-list {
   list-style: decimal;
   padding-left: 1.4rem;
