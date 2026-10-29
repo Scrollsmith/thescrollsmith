@@ -1318,6 +1318,69 @@ audio {
   color: var(--accent);
 }
 
+.doctrine-affiliation {
+  margin: 0 0 1.4rem;
+}
+
+.doctrine-affiliation p {
+  margin: 0 0 0.2rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.doctrine-affiliation strong {
+  color: var(--text);
+}
+
+.doctrine-article h3 {
+  margin-top: 1.35rem;
+  margin-bottom: 0.55rem;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.doctrine-formula {
+  font-family: "Consolas", "Courier New", monospace;
+  color: var(--accent);
+}
+
+.doctrine-equation {
+  text-align: center;
+  margin: 0.85rem 0 1.1rem !important;
+  color: var(--text) !important;
+  font-size: 1.05rem;
+}
+
+.doctrine-diagram,
+.doctrine-state-engine {
+  margin: 1rem 0 1.35rem;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  border: 1px solid rgba(108, 242, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(8, 10, 17, 0.85);
+  color: var(--muted);
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  white-space: pre;
+}
+
+.doctrine-references {
+  list-style: none;
+  padding-left: 0;
+}
+
+.doctrine-references li {
+  padding-left: 1.1rem;
+  text-indent: -1.1rem;
+}
+
+.doctrine-references em {
+  color: var(--text);
+  font-style: italic;
+}
+
 .release-track-list {
   list-style: decimal;
   padding-left: 1.4rem;
