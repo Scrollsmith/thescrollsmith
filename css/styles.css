@@ -1232,6 +1232,28 @@ audio {
   font-size: clamp(1.7rem, 4.5vw, 2.8rem);
 }
 
+.current-release-hero-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 1.4rem;
+  align-items: center;
+}
+
+.release-cover {
+  max-width: 320px;
+  margin-inline: auto;
+}
+
+@media (max-width: 900px) {
+  .current-release-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .release-cover {
+    max-width: 260px;
+  }
+}
+
 .release-track-list {
   list-style: decimal;
   padding-left: 1.4rem;
