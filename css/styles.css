@@ -1381,6 +1381,31 @@ audio {
   font-style: italic;
 }
 
+.doctrine-maxim {
+  color: var(--text) !important;
+  font-style: italic;
+  margin-bottom: 0.95rem !important;
+}
+
+.doctrine-article sup {
+  color: var(--accent);
+  font-size: 0.75em;
+}
+
+.doctrine-footnotes {
+  color: var(--muted);
+  line-height: 1.65;
+  padding-left: 1.35rem;
+}
+
+.doctrine-footnotes li + li {
+  margin-top: 0.65rem;
+}
+
+.doctrine-footnotes strong {
+  color: var(--text);
+}
+
 .release-track-list {
   list-style: decimal;
   padding-left: 1.4rem;
