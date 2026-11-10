@@ -1,0 +1,18 @@
+{
+  "name": "kyros-tele",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node index2.mjs",
+    "doctor": "node kyros_doctor.mjs",
+    "selftest": "node index2.selftest.mjs && node kyros_scheduler.mjs --selftest",
+    "sched": "node kyros_scheduler.mjs"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "telegraf": "^4.16.3"
+  }
+}
