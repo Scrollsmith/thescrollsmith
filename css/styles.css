@@ -1746,3 +1746,49 @@ a.member-card:hover {
   max-width: 28rem;
   margin-top: 0.15rem;
 }
+
+
+/* kyros-chronicles-chapter */
+.chronicle-intro {
+  max-width: 62ch;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 0 1.6rem;
+}
+
+.chronicle-chapter {
+  margin-top: 0.4rem;
+}
+
+.chronicle-entry {
+  margin: 0 0 1.45rem;
+  max-width: 68ch;
+}
+
+.chronicle-speaker {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.chronicle-speaker a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(108, 242, 255, 0.35);
+}
+
+.chronicle-speaker a:hover {
+  border-bottom-color: var(--accent);
+}
+
+.chronicle-entry p {
+  margin: 0 0 0.85rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.chronicle-entry p:last-child {
+  margin-bottom: 0;
+}
