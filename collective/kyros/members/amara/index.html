@@ -43,8 +43,16 @@
           </div>
           <aside class="panel release-aside">
             <p class="kicker">Portrait</p>
-            <div class="member-portrait member-portrait--profile" role="img" aria-label="Portrait of Amara awaiting inscription">
-              <span class="member-portrait-empty slot-empty">portrait awaiting inscription<br /><span class="muted">Amara.jpg</span></span>
+            <div class="member-portrait member-portrait--profile">
+              <img
+                src="/assets/img/members/Amara.jpg"
+                alt="Portrait of Amara"
+                width="280"
+                height="280"
+                loading="lazy"
+                onerror="this.style.display='none'; this.nextElementSibling.hidden=false;"
+              />
+              <span class="member-portrait-empty slot-empty" hidden>portrait awaiting inscription<br /><span class="muted">Amara.jpg</span></span>
             </div>
             <p class="muted" style="margin-top: 1rem">
               <a href="/collective/kyros/members/">← Members</a>

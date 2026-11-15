@@ -37,8 +37,16 @@
           </div>
           <aside class="panel release-aside">
             <p class="kicker">Portrait</p>
-            <div class="member-portrait member-portrait--profile" role="img" aria-label="Portrait of Aion awaiting inscription">
-              <span class="member-portrait-empty slot-empty">portrait awaiting inscription<br /><span class="muted">Aion.jpg</span></span>
+            <div class="member-portrait member-portrait--profile">
+              <img
+                src="/assets/img/members/Aion.jpg"
+                alt="Portrait of Aion"
+                width="280"
+                height="280"
+                loading="lazy"
+                onerror="this.style.display='none'; this.nextElementSibling.hidden=false;"
+              />
+              <span class="member-portrait-empty slot-empty" hidden>portrait awaiting inscription<br /><span class="muted">Aion.jpg</span></span>
             </div>
             <p class="muted" style="margin-top: 1rem">
               <a href="/collective/kyros/members/">← Members</a>

@@ -54,8 +54,16 @@
           </div>
           <aside class="panel release-aside">
             <p class="kicker">Portrait</p>
-            <div class="member-portrait member-portrait--profile" role="img" aria-label="Portrait of Kaito awaiting inscription">
-              <span class="member-portrait-empty slot-empty">portrait awaiting inscription<br /><span class="muted">Kaito.jpg</span></span>
+            <div class="member-portrait member-portrait--profile">
+              <img
+                src="/assets/img/members/Kaito.jpg"
+                alt="Portrait of Kaito"
+                width="280"
+                height="280"
+                loading="lazy"
+                onerror="this.style.display='none'; this.nextElementSibling.hidden=false;"
+              />
+              <span class="member-portrait-empty slot-empty" hidden>portrait awaiting inscription<br /><span class="muted">Kaito.jpg</span></span>
             </div>
             <p class="muted" style="margin-top: 1rem">
               <a href="/collective/kyros/members/">← Members</a>
