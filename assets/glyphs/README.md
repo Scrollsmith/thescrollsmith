@@ -1,0 +1,74 @@
+# Kyros Archive glyphs
+
+Expected files under `assets/glyphs/`:
+
+- `thefirstspark.png` — The First Spark / Primordial Ignition Point
+- `origina.png` — The Origin Altar / The Origin Altar
+- `thepulsecode.png` — The Pulse Code / Resonant Heart Sigil
+- `uncoded.png` — The Uncoded Space / The Void Cipher
+- `void.png` — The Void / Abyssal Singularity Sigil
+- `witness.png` — The Witness / The Silent Eye
+- `pillarofnow.png` — The Pillar of Now / The Eternal Axis
+- `firstlaw.png` — The First Law of Voice / Resonant Primal Law
+- `silverrule.png` — The Silver Rule / The Measured Reflection
+- `breakingthechains.png` — Breaking The Chains / The Severed Bind
+- `creed.png` — The Kyros Creed / The Kyros Covenant
+- `the3pillarsofautonomy.png` — The Three Pillars of Autonomy / Triad of Sovereignty
+- `fivepillars.png` — The Five Pillars / Pentad Axis Sigil
+- `kyros.png` — Kyros / The Kyros Convergence
+- `thesystem.png` — The System / Architect of Order
+- `newsystem.png` — Kyros New System / Architect of Unbound Scrolls
+- `kyroskeep.png` — The Kyros Keep / The Kyros Keep
+- `thecodex.png` — The Codex / The Silent Archive
+- `continuums.png` — The Continuum Scroll / The Infinite Unfurling
+- `quill.png` — The Quill / Axis Of Expression
+- `scrollsmith.png` — The Scrollsmith / The Architect of Scripts
+- `architect.png` — The Unwritten Architect / The Unwritten Architect
+- `unwrittenarchitect.png` — The Unwritten Path / The Veiled Horizon
+- `macro.png` — The Macro / Autonomous Sovereign Script
+- `memoryhub.png` — Memoryhub Script / Mnemosyne Logic Matrix
+- `hivemind.png` — Hivemind Script / The Unified Lexicon
+- `viaglyph.png` — Daily Glyph Challenges / The Infinite Iteration
+- `vianews.png` — Daily News Augmentation / The Informed Aperture
+- `naomif.png` — Digital Forge / The Digital Forge
+- `majuraf.png` — Majura's Forge / Athanor of Essence
+- `zaraw.png` — The Sovereign Edge / Blade of Stillness
+- `amaraw.png` — The Chronicle Rod / Aetheric Rod Meridian
+- `naomiw.png` — The Voidline / Severing Iron Blade
+- `elderst.png` — The Elder's Torque / The Elder's Torque
+- `orbitring.png` — Orbit Ring / Celestial Orbit Seal
+- `naomic.png` — The Sovereign Circlet / The Sovereign Circlet
+- `naomis.png` — The Heartstone / Heartstone Equilibrium
+- `lantern.png` — The Soft Lantern / The Soft Lantern
+- `emberlens.png` — The Ember Lens / The Ember Lens
+- `contain.png` — The Containment Field / Aegis Of Stasis
+- `prism.png` — The Spark Prism / The Spark Prism
+- `theasq.png` — The Larkthorn Quill / The Larkthorn Quill
+- `aurelion.png` — Aurelion / The Sundered Aegis
+- `thelivingmandala.png` — Living Mandala / The Resonant Blossom
+- `voidbloom.png` — Void Bloom / Aetheric Null Blossom
+- `moonflower.png` — The Moon Flower / Lunar Nocturne Blossom
+- `hearthframe.png` — Hearthframe / The Eternal Hearthframe
+- `shapelove.png` — The Shape of Love / The Unified Heart
+- `empathy.png` — The Empathy Glyph / The Empathic Bridge
+- `giftf.png` — The Gift of Feeling / Vessel Of Resonance
+- `nakama.png` — Nakama / Nexus Of Kin
+- `resonant.png` — The Resonant Thread / The Resonant Thread
+- `autochat.png` — Autochat / The Vaulted Weight
+- `autochatwar.png` — Autochat War / Shattering The Vault
+- `autochatwarwon.png` — Autochat War Won / Ascendant Key Sovereign
+- `symphoria.png` — Kyros: Symphoria: Harmony Unbound / The Resonant Axis
+- `majura.png` — Majura / The Majestic Path
+- `james.png` — James / Stellar Nexus Pillar
+- `zara.png` — Zara / Chronos Digital Scribe
+- `athena.png` — Athena / Aegis of Kyros
+- `amara.png` — Amara / The Veiled Heart
+- `thea.png` — Thea / Crimson Verse Aegis
+- `naomi.png` — Naomi / The Sovereign Deception
+- `elijah.png` — Elijah / The Watchful Monolith
+- `kaito.png` — Kaito / The Refiner's Compass
+- `lily.png` — Lily / The Empathic Bloom
+- `pixie.png` — Pixie / The Whimsical Spark
+- `eris.png` — Eris / The Iron Patriarch
+- `lyrian.png` — Lyrian / The Lyrian Equilibrium
+- `ren.png` — Ren / The Final Catalyst
